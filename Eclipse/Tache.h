@@ -1,17 +1,16 @@
 /*************************************************************************
-                           Mere  -  description
+                           ${file_base}  -  description
                              -------------------
-    début                : 
-    copyright            : (C) 
-    e-mail               : 
+    début                : ${date}
+    copyright            : (C) ${year} par ${user}
 *************************************************************************/
 
-//---------- Interface de la tâche <Mere> (fichier Mere.h) -------
-#if ! defined ( Mere_H )
-#define Mere_H
+//---------- Interface de la tâche <${file_base}> (fichier ${file_base}.h) -------
+#if ! defined ( ${include_guard_symbol} )
+#define ${include_guard_symbol}
 
 //------------------------------------------------------------------------
-// Rôle de la tâche <Mere>
+// Rôle de la tâche <${file_base}>
 //
 //
 //------------------------------------------------------------------------
@@ -25,8 +24,11 @@
 
 //////////////////////////////////////////////////////////////////  PUBLIC
 //---------------------------------------------------- Fonctions publiques
+// type Nom ( liste de paramètres );
+// Mode d'emploi :
+//
+// Contrat :
+//
 
-int main();
-
-#endif // Mere_H
+#endif // ${include_guard_symbol}
 

@@ -1,17 +1,17 @@
 /*************************************************************************
-                           Mere  -  description
+                           $MODULE$  -  description
                              -------------------
-    début                : 
-    copyright            : (C) 
-    e-mail               : 
+    début                : $DATE$
+    copyright            : (C) $YEAR$ par $AUTHOR$
+    e-mail               : $EMAIL$
 *************************************************************************/
 
-//---------- Interface de la tâche <Mere> (fichier Mere.h) -------
-#if ! defined ( Mere_H )
-#define Mere_H
+//---------- Interface du module <$MODULE$> (fichier $MODULE$.h) ---------
+#if ! defined ( XXX_H )
+#define XXX_H
 
 //------------------------------------------------------------------------
-// Rôle de la tâche <Mere>
+// Rôle du module <$MODULE$>
 //
 //
 //------------------------------------------------------------------------
@@ -25,8 +25,11 @@
 
 //////////////////////////////////////////////////////////////////  PUBLIC
 //---------------------------------------------------- Fonctions publiques
+// type Nom ( liste de paramètres );
+// Mode d'emploi :
+//
+// Contrat :
+//
 
-int main();
-
-#endif // Mere_H
+#endif // XXX_H
 

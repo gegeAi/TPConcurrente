@@ -3,7 +3,7 @@ RM = rm
 EDL = g++
 COMP = g++
 ECHO = @echo
-INT = Mere.h Config.h libtp.a
+INT = Outils.h Mere.h Config.h libtp.a
 REAL = $(INT:.h=.cpp)
 OBJ = $(INT:.h=.o)
 OUTPUT = -o
@@ -13,7 +13,7 @@ CLEAN = efface
 $(EXE): $(OBJ)
 	$(EDL)  $(OUTPUT) $(EXE) $(EDLFLAGS) $(OBJ)
 
-Mere.o : Mere.cpp Config.h libtp.a
+Mere.o : Mere.cpp Outils.h Config.h libtp.a
 	$(COMP) $(CPPFLAGS) -c Mere.cpp
 
 $(CLEAN):

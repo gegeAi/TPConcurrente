@@ -2,22 +2,13 @@
 #include <sys/shm.h>
 
 #include "Config.h"
+#include "Outils.h"
 
-void initAppli();
-void detruireAppli();
 
 int main()
 {
-	initAppli();
+	InitialiserApplication(XTERM);
+	sleep(10);
 	return 0;
 }
 
-void initAppli()
-{
-
-}
-
-void detruireAppli()
-{
-
-}

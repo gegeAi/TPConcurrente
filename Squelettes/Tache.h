@@ -1,17 +1,17 @@
 /*************************************************************************
-                           Mere  -  description
+                           XXX  -  description
                              -------------------
-    début                : 
-    copyright            : (C) 
-    e-mail               : 
+    début                : XXX
+    copyright            : (C) XXX par XXX
+    e-mail               : XXX
 *************************************************************************/
 
-//---------- Interface de la tâche <Mere> (fichier Mere.h) -------
-#if ! defined ( Mere_H )
-#define Mere_H
+//---------- Interface de la tâche <XXX> (fichier XXX.h) -------
+#if ! defined ( XXX_H )
+#define XXX_H
 
 //------------------------------------------------------------------------
-// Rôle de la tâche <Mere>
+// Rôle de la tâche <XXX>
 //
 //
 //------------------------------------------------------------------------
@@ -25,8 +25,11 @@
 
 //////////////////////////////////////////////////////////////////  PUBLIC
 //---------------------------------------------------- Fonctions publiques
+// type Nom ( liste de paramètres );
+// Mode d'emploi :
+//
+// Contrat :
+//
 
-int main();
-
-#endif // Mere_H
+#endif // XXX_H
 
