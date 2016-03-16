@@ -11,9 +11,9 @@ CPPFLAGS = -Wall #-DMAP
 CLEAN = efface
 
 $(EXE): $(OBJ)
-	$(EDL)  $(OUTPUT) $(EXE) $(OBJ) -l ./libtp
+	$(EDL)  $(OUTPUT) $(EXE) $(OBJ) -L libtp.a -l libtp.a
 
-Mere.o : Mere.cpp Config.h 
+Mere.o : Mere.cpp Config.h Outils.h
 	$(COMP) $(CPPFLAGS) -c Mere.cpp
 
 $(CLEAN):
