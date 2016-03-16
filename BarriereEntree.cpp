@@ -15,6 +15,9 @@ using namespace std;
 #include <signal.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <sys/msg.h>
+#include <sys/types.h>
+#include <sys/ipc.h>
 //------------------------------------------------------ Include personnel
 #include "Stats_C_Tab.h"
 
@@ -43,7 +46,7 @@ static void ITFinFils(noSig)
 	
 }
 
-static void init()
+static void init(const char nomBal)
 {
 	//masquage de SIGUSR1 et SIGUSR2
 	struct sigaction masquage;
@@ -70,7 +73,7 @@ static void init()
 	sigaction (SIGUSR2, &action2, NULL);
 	
 	//récupération de la boîte aux lettres
-    key_t clefBAL = ftok("File", 1);
+    key_t clefBAL = ftok(nomBal, 1);
     id_bal = msgget(clefBAL, 0660);
     
     //récupération du sémaphore
@@ -87,18 +90,18 @@ static void init()
 }
 
 
-void BarriereEntree(char * nomBal)
+void BarriereEntree(const char * nomBal)
 {
-	init();
+	init(nomBal);
 	
-	for(;;)
+	/*for(;;)
 	{
 		//Recuperation du message
 		MsgVoiture newCar;
 		while(msgrcv(id_bal, &newCar, TAILLE_MSG_VOITURE, typeVoie, 0) == -1 && errno == EINTR);
 		
 		
-	}
+	}*/
 }
 
 
