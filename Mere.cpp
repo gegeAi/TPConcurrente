@@ -46,7 +46,7 @@
 
 int main()
 {
-	//InitialiserApplication(XTERM);
+	InitialiserApplication(XTERM);
 	//creation memoires partagee
 	int parking;
 	int arriveeVoiture;
@@ -54,13 +54,13 @@ int main()
 	int compteurVoiture;
 	int semaphore;
 
-	parking = shmget(ftok(REFERENCE, 'P'), sizeof(Voiture)*8, IPC_CREAT | IPC_EXCL | DROITS);
-	arriveeVoiture = msgget(ftok(REFERENCE, 'A'), IPC_CREAT | IPC_EXCL | DROITS);
-	requete = shmget(ftok(REFERENCE, 'R'), sizeof(Requete)*3, IPC_CREAT | IPC_EXCL | DROITS);
-	compteurVoiture = shmget(ftok(REFERENCE, 'C'), sizeof(int), IPC_CREAT | IPC_EXCL | DROITS);
+	parking = shmget(ftok(REFERENCE, 1), sizeof(Voiture)*8, IPC_CREAT | IPC_EXCL | DROITS);
+	arriveeVoiture = msgget(ftok(REFERENCE, 2), IPC_CREAT | IPC_EXCL | DROITS);
+	requete = shmget(ftok(REFERENCE, 3), sizeof(Requete)*3, IPC_CREAT | IPC_EXCL | DROITS);
+	compteurVoiture = shmget(ftok(REFERENCE, 4), sizeof(int), IPC_CREAT | IPC_EXCL | DROITS);
 
 
-	semaphore = semget(ftok(REFERENCE, 'S'), 6, IPC_CREAT | DROITS);
+	semaphore = semget(ftok(REFERENCE, 5), 6, IPC_CREAT | DROITS);
 
 	sleep(10);
 
@@ -70,9 +70,7 @@ int main()
 	shmctl(compteurVoiture, IPC_RMID, NULL);
 	semctl(semaphore, 0, IPC_RMID);
 
-	
-
-	//TerminerApplication(true);
+	TerminerApplication(true);
 	
 	return 0;
 }
