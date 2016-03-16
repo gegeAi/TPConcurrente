@@ -11,7 +11,7 @@ CPPFLAGS = -Wall #-DMAP
 CLEAN = efface
 
 $(EXE): $(OBJ)
-	$(EDL)  $(OUTPUT) $(EXE) $(OBJ) -ltermcap -L "./" -l tp
+	$(EDL)  $(OUTPUT) $(EXE) $(OBJ) -ltermcap -ltcl8.5 -L "./" -l tp
 
 Mere.o : Mere.cpp Config.h Outils.h
 	$(COMP) $(CPPFLAGS) -c Mere.cpp

@@ -13,7 +13,7 @@ CLEAN = efface
 $(EXE): $(OBJ)
 	$(EDL)  $(OUTPUT) $(EXE) $(OBJ) -ltermcap -ltcl8.5 -L "./" -l tp
 
-Mere.o : Mere.cpp Config.h Outils.h
+Mere.o : Mere.cpp Config.h Outils.h Heure.h
 	$(COMP) $(CPPFLAGS) -c Mere.cpp
 
 $(CLEAN):
