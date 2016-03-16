@@ -72,16 +72,16 @@ static void init()
 	sigaction (SIGUSR2, &masquage, NULL);
 	
 	//récupération des boîtes aux lettres
-    key_t clefBALProfs = ftok("FileProfs", 1);
+    key_t clefBALProfs = ftok(REFERENCE, 'R');
     id_balProfs = msgget(clefBALProfs, 0660);
     
-    key_t clefBALAutres = ftok("FileAutres", 1);
+    key_t clefBALAutres = ftok(REFERENCE, 'R');
     id_balAutres = msgget(clefBALAutres, 0660);
     
-    key_t clefBALGB = ftok("FileGB", 1);
+    key_t clefBALGB = ftok(REFERENCE, 'R');
     id_balGB = msgget(clefBALGB, 0660);
     
-    key_t clefBALSortie = ftok("PlaceSortie", 1);
+    key_t clefBALSortie = ftok(REFERENCE, 'R');
     id_balSortie = msgget(clefBALSortie, 0660);
     
     nouveau.num = 0;
@@ -97,17 +97,19 @@ static void init()
 {
 } //----- fin de Nom*/
 
-void GestionMenu(int noSig)
+void GestionMenu()
 // Algorithme :
 //
 {
 	init();
 	char cmd;
 	
-	for(;;)
+	/*for(;;)
 	{
-				
-	}
+		Menu();
+	}*/
+	sleep(20);
+	exit(0);
 	
 }//----- fin de GestionMenu
 

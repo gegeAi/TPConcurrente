@@ -82,10 +82,10 @@ static void init(const char nomBal)
     
     
     //récupération mémoires partagées
-    key_t clefMPReq = ftok("Requete",1);
+    key_t clefMPReq = ftok(REFERENCE, 'R');
     id_mpReq = shmget(clefMPReq,1);
     
-    key_t clefMPReq = ftok("Parking",1);
+    key_t clefMPParking = ftok(REFERENCE, 'P');
     id_mpParking = shmget(clefMPParking,1);;
 }
 
