@@ -17,15 +17,15 @@ enum SemUsg
 typedef struct Voiture Voiture;
 struct Voiture
 {
-	TypeUsager type;
+	char type;
 	int num;
-	int hEntree;
+	int hEntree, hSortie, cout;
 };	
 
 typedef struct Requete Requete;
 struct Requete
 {
-	TypeUsager type;
+	char type;
 	int hRequete;
 };
 	

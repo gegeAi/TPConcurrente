@@ -22,19 +22,22 @@ using namespace std;
 
 //------------------------------------------------------ Include personnel
 #include "GestionMenu.h"
+#include "Menu.h"
+
+#include "Config.h"
 
 ///////////////////////////////////////////////////////////////////  PRIVE
 //------------------------------------------------------------- Constantes
 
 //------------------------------------------------------------------ Types
-struct Voiture{
+/*struct Voiture{
 	
 	char type;
 	int num;
 	int hEntree, hSortie, cout;
 	
 };
-typedef struct Voiture Voiture;
+typedef struct Voiture Voiture;*/
 
 //---------------------------------------------------- Variables statiques
 static int id_balProfs;
@@ -72,16 +75,16 @@ static void init()
 	sigaction (SIGUSR2, &masquage, NULL);
 	
 	//récupération des boîtes aux lettres
-    key_t clefBALProfs = ftok(REFERENCE, 'R');
+    key_t clefBALProfs = ftok(REFERENCE, 2);
     id_balProfs = msgget(clefBALProfs, 0660);
     
-    key_t clefBALAutres = ftok(REFERENCE, 'R');
+    key_t clefBALAutres = ftok(REFERENCE, 3);
     id_balAutres = msgget(clefBALAutres, 0660);
     
-    key_t clefBALGB = ftok(REFERENCE, 'R');
+    key_t clefBALGB = ftok(REFERENCE, 4);
     id_balGB = msgget(clefBALGB, 0660);
     
-    key_t clefBALSortie = ftok(REFERENCE, 'R');
+    key_t clefBALSortie = ftok(REFERENCE, 5);
     id_balSortie = msgget(clefBALSortie, 0660);
     
     nouveau.num = 0;
@@ -97,6 +100,7 @@ static void init()
 {
 } //----- fin de Nom*/
 
+
 void GestionMenu()
 // Algorithme :
 //
@@ -104,11 +108,11 @@ void GestionMenu()
 	init();
 	char cmd;
 	
-	/*for(;;)
+	for(;;)
 	{
 		Menu();
-	}*/
-	sleep(20);
+	}
+	//sleep(20);
 	exit(0);
 	
 }//----- fin de GestionMenu
@@ -133,9 +137,9 @@ void Commande( char code, unsigned int valeur)
 			nouveau.cout = 0;
 			nouveau.num = nouveau.num%1000;
 			
-			/*if(valeur == 1)
+			if(valeur == 1)
 			{									
-				if(/*msgsnd(id_balProfs,,,)==-1)
+				if(msgsnd(id_balProfs,&nouveau,sizeof(Voiture),0)==-1)
 				{
 					//Afficher(MESSAGE, "Voiture non creee", NORMALE);
 				}
@@ -146,7 +150,7 @@ void Commande( char code, unsigned int valeur)
 			}
 			else
 			{
-				if(msgsnd(id_balGB,,,)==-1)
+				if(msgsnd(id_balGB,&nouveau,sizeof(Voiture),0)==-1)
 				{
 					//Afficher(MESSAGE, "Voiture non creee", NORMALE);
 				}
@@ -154,7 +158,7 @@ void Commande( char code, unsigned int valeur)
 				{
 					//Afficher(MESSAGE, "", NORMALE);
 				}
-			}*/
+			}
 		}
 		case 'A' :
 		{
@@ -165,7 +169,7 @@ void Commande( char code, unsigned int valeur)
 			nouveau.cout = 0;
 			nouveau.num = nouveau.num%1000;
 			
-			/*if(valeur == 1)
+			if(valeur == 1)
 			{			
 				if(msgsnd(id_balAutres,&nouveau,sizeof(Voiture),0)==-1)
 				{
@@ -187,11 +191,10 @@ void Commande( char code, unsigned int valeur)
 				{
 					//Afficher(MESSAGE, "", NORMALE);
 				}
-			}*/
+			}
 		}
 		case 'S' :
 		{
-			/*//Afficher(MENU,"Sortie - Choix de la place : [1] ... [8] Gaston Berger",NORMALE);
 			if(msgsnd(id_balSortie,&valeur,sizeof(unsigned int),0)==-1)
 			{
 				//Afficher(MESSAGE, "Sortie non prise en compte", NORMALE);
@@ -199,7 +202,7 @@ void Commande( char code, unsigned int valeur)
 			else
 			{
 				//Afficher(MESSAGE, "", NORMALE);
-			}*/
+			}
 		}
 	}
 }//----- fin de Commande

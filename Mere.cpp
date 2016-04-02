@@ -22,7 +22,7 @@
 
 //------------------------------------------------------ Include personnel
 #include "Mere.h"
-
+#include "GestionMenu.h"
 #include "Outils.h"
 #include "Heure.h"
 #include "Config.h"
@@ -79,7 +79,7 @@ int main()
 
 	if((gestionMenu = fork()) == 0)
 	{
-		//GestionMenu();
+		GestionMenu();
 		exit(0);
 	}
 	else

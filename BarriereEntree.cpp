@@ -19,7 +19,9 @@ using namespace std;
 #include <sys/types.h>
 #include <sys/ipc.h>
 //------------------------------------------------------ Include personnel
-#include "Stats_C_Tab.h"
+#include "BarriereEntree.h"
+#include "Config.h"
+
 
 //------------------------------------------------------------- Constantes
 
@@ -73,7 +75,7 @@ static void init(const char nomBal)
 	sigaction (SIGUSR2, &action2, NULL);
 	
 	//récupération de la boîte aux lettres
-    key_t clefBAL = ftok(nomBal, 1);
+    key_t clefBAL = ftok(REFERENCE, numBal);
     id_bal = msgget(clefBAL, 0660);
     
     //récupération du sémaphore
@@ -82,26 +84,28 @@ static void init(const char nomBal)
     
     
     //récupération mémoires partagées
-    key_t clefMPReq = ftok(REFERENCE, 'R');
+    key_t clefMPReq = ftok(REFERENCE, 6);
     id_mpReq = shmget(clefMPReq,1);
     
-    key_t clefMPParking = ftok(REFERENCE, 'P');
+    key_t clefMPParking = ftok(REFERENCE, 1);
     id_mpParking = shmget(clefMPParking,1);;
 }
 
-
-void BarriereEntree(const char * nomBal)
+/**
+ * T0D0 : rajouter le numero de la boite au lettre dans param de BE
+ */
+void BarriereEntree(int numBal)
 {
-	init(nomBal);
+	init(numBal);
 	
-	/*for(;;)
+	for(;;)
 	{
 		//Recuperation du message
 		MsgVoiture newCar;
 		while(msgrcv(id_bal, &newCar, TAILLE_MSG_VOITURE, typeVoie, 0) == -1 && errno == EINTR);
 		
 		
-	}*/
+	}
 }
 
 
