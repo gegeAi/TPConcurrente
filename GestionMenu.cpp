@@ -24,6 +24,7 @@ using namespace std;
 #include "GestionMenu.h"
 #include "Menu.h"
 
+#include "Outils.h"
 #include "Config.h"
 
 ///////////////////////////////////////////////////////////////////  PRIVE
@@ -106,13 +107,11 @@ void GestionMenu()
 //
 {
 	init();
-	char cmd;
 	
 	for(;;)
 	{
 		Menu();
 	}
-	//sleep(20);
 	exit(0);
 	
 }//----- fin de GestionMenu
@@ -123,6 +122,8 @@ void Commande( char code, unsigned int valeur)
 // Algorithme :
 //
 {
+	//Afficher(MESSAGE, code+"", NORMALE);
+	sleep(5);
 	switch(code)
 	{
 		case 'E' :
@@ -131,7 +132,7 @@ void Commande( char code, unsigned int valeur)
 		}
 		case 'P' :
 		{
-			nouveau.type = 'P';
+			nouveau.type = PROF;
 			nouveau.hEntree = time(NULL);
 			nouveau.hSortie = 0;
 			nouveau.cout = 0;
@@ -139,22 +140,24 @@ void Commande( char code, unsigned int valeur)
 			
 			if(valeur == 1)
 			{									
-				if(msgsnd(id_balProfs,&nouveau,sizeof(Voiture),0)==-1)
+				//if(msgsnd(id_balProfs,&nouveau,TAILLE_MSG_VOITURE,0)==-1)
 				{
+					DessinerVoitureBarriere(PROF_BLAISE_PASCAL,PROF);
 					//Afficher(MESSAGE, "Voiture non creee", NORMALE);
 				}
-				else
+				//else
 				{
 					//Afficher(MESSAGE, "", NORMALE);
 				}
 			}
 			else
 			{
-				if(msgsnd(id_balGB,&nouveau,sizeof(Voiture),0)==-1)
+				//if(msgsnd(id_balGB,&nouveau,TAILLE_MSG_VOITURE,0)==-1)
 				{
+					DessinerVoitureBarriere(ENTREE_GASTON_BERGER,PROF);
 					//Afficher(MESSAGE, "Voiture non creee", NORMALE);
 				}
-				else
+				//else
 				{
 					//Afficher(MESSAGE, "", NORMALE);
 				}
@@ -163,7 +166,7 @@ void Commande( char code, unsigned int valeur)
 		case 'A' :
 		{
 		
-			nouveau.type = 'A';
+			nouveau.type = AUTRE;
 			nouveau.hEntree = time(NULL);
 			nouveau.hSortie = 0;
 			nouveau.cout = 0;
@@ -171,23 +174,27 @@ void Commande( char code, unsigned int valeur)
 			
 			if(valeur == 1)
 			{			
-				if(msgsnd(id_balAutres,&nouveau,sizeof(Voiture),0)==-1)
+				//if(msgsnd(id_balAutres,&nouveau,TAILLE_MSG_VOITURE,0)==-1)
 				{
-					//Afficher(MESSAGE, "Voiture non creee", NORMALE);
+					
+					DessinerVoitureBarriere(AUTRE_BLAISE_PASCAL,AUTRE);
+					Afficher(MESSAGE, "Bizarre", NORMALE);
 				}
-				else
+				//else
 				{
+
 					//Afficher(MESSAGE, "", NORMALE);
 				}
 			}
 			else
 			{
 		
-				if(msgsnd(id_balGB,&nouveau,sizeof(Voiture),0)==-1)
+				//if(msgsnd(id_balGB,&nouveau,TAILLE_MSG_VOITURE,0)==-1)
 				{
+					DessinerVoitureBarriere(ENTREE_GASTON_BERGER,AUTRE);
 					//Afficher(MESSAGE, "Voiture non creee", NORMALE);
 				}
-				else
+				//else
 				{
 					//Afficher(MESSAGE, "", NORMALE);
 				}
@@ -195,7 +202,7 @@ void Commande( char code, unsigned int valeur)
 		}
 		case 'S' :
 		{
-			if(msgsnd(id_balSortie,&valeur,sizeof(unsigned int),0)==-1)
+			if(msgsnd(id_balSortie,&valeur,TAILLE_MSG_VOITURE,0)==-1)
 			{
 				//Afficher(MESSAGE, "Sortie non prise en compte", NORMALE);
 			}
