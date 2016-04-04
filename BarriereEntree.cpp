@@ -28,12 +28,14 @@ using namespace std;
 
 //---------------------------------------------------- Variables de classe
 static int id_bal;
-static int id_semMP;
+static int id_semReq;
 static int id_semSync;
 static int id_semCompt;
+static int id_semPark;
 static int id_mpReq;
 static int id_mpParking;
 static int id_mpCompteur;
+static int numMemoire;
 static TypeBarriere barriere;
 static Voiture n ;
 static Voiture * parking;
@@ -93,14 +95,34 @@ static void init(const char nomBal)
 	action2.sa_flags = 0;
 	sigaction (SIGCHLD, &action2, NULL);
 	
+	switch(barriere) {
+			case PROF_BLAISE_PASCAL :
+				numMemoire = 0;
+				break;
+				
+			case AUTRE_BLAISE_PASCAL :
+				numMemoire = 1;
+				break;
+			
+			case ENTREE_GASTON_BERGER :
+				numMemoire = 2;
+				break;
+		
+		
+		
+	}
+	
 	//récupération de la boîte aux lettres
     id_bal = boiteAL;
     
     //récupération du sémaphore sur MP req
-    id_semMP = semMP;
+    id_semReq = semMP;
     
     //récupération du sémaphore de synchro
     id_semSync = semSync;
+    
+    //récupération du sémaphore de parking
+    id_semPark = semPark;
     
     //récup sémaphore de compteur
     id_semCompt = semCompteur;
@@ -108,11 +130,7 @@ static void init(const char nomBal)
     
     //récupération mémoires partagées
     id_mpReq = MPReq;
-    voiturePresente = (bool *) shmat(id_mpReq,NULL,0);
-    
-    semop(id_sem, &semP,1 );
-	voiturePresente = false;
-	semop(id_sem, &semV,1 );
+    voiturePresente = (Requete *) shmat(id_mpReq,NULL,0);
     
     id_mpParking = MPPark;
     parking = (Voiture *) shmat(id_mpParking,NULL,0);
@@ -124,37 +142,39 @@ static void init(const char nomBal)
 /**
  * T0D0 : rajouter le numero de la boite au lettre dans param de BE
  */
-void BarriereEntree(TypeBarriere barr, unsigned int semMP, unsigned int semSync, unsigned int semCompteur, unsigned int boiteAL, unsigned int MPReq, unsigned int MPPark, unsigned int MPCompteur)
+void BarriereEntree(TypeBarriere barr, unsigned int semMP, unsigned int semSync, unsigned int semCompteur, unsigned int semPark,  unsigned int boiteAL, unsigned int MPReq, unsigned int MPPark, unsigned int MPCompteur)
 {
-	init(TypeBarriere barr, unsigned int semMP, unsigned int semSync, unsigned int semCompteur, unsigned int boiteAL, unsigned int MPReq, unsigned int MPPark, unsigned int MPCompteur);
+	init(TypeBarriere barr, unsigned int semMP, unsigned int semSync, unsigned int semCompteur, unsigned int semPark, unsigned int boiteAL, unsigned int MPReq, unsigned int MPPark, unsigned int MPCompteur);
 	
 	for(;;)
 	{
-		semop(id_sem, &semP,1 );
-		voiturePresente = false;
-		semop(id_sem, &semV,1 );
 		
 		//Recuperation du message
 		while(msgrcv(id_bal, &newCar, TAILLE_MSG_VOITURE, 0, 0) == -1 && errno == EINTR);
 		
-		semop(id_sem, &semP,1 );
+		semop(id_semCompt, &semP,1 );
 		if(*(compteurPlace)>0)
 		{
 			*(compteurPlace)--;
-			semop(id_sem, &semV,1 );
+			semop(id_semCompt, &semV,1 );
+			
 			pid_t voiturier = GarerVoiture(barriere);
 			int place;
 			waitpid(noFils, &place, 0);
-			*(parking+(place-1)) = newCar;
 			
+			semop(id_semPark, &semP,1 );
+			*(parking+(place-1)) = newCar;
+			semop(id_semPark, &semV,1 );
 			
 		}
 		else
 		{
-			semop(id_sem, &semV,1 );
+			semop(id_semCompt, &semV,1 );
 			
+			//Depot de la requête
 			semop(id_sem, &semP,1 );
-			voiturePresente = true;
+			voiturePresente[numMemoire].type = newCar.type;
+			voiturePresente[numMemoire].hRequete = newCar.hEntree;
 			semop(id_sem, &semV,1 );
 		
 			
@@ -166,12 +186,17 @@ void BarriereEntree(TypeBarriere barr, unsigned int semMP, unsigned int semSync,
 			// Attente de l'autorisation de garage
 			semop(id_semSync, &semP,1 );
 			
+			semop(id_semCompt, &semP,1 );
 			*(compteurPlace)--;
-			semop(id_sem, &semV,1 );
+			semop(id_semCompt, &semV,1 );
+			
 			pid_t voiturier = GarerVoiture(barriere);
 			int place;
 			waitpid(noFils, &place, 0);
+			
+			semop(id_semPark, &semP,1 );
 			*(parking+(place-1)) = newCar;
+			semop(id_semPark, &semV,1 );
 		}
 		
 		

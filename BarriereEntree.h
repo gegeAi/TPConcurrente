@@ -26,7 +26,7 @@
 //////////////////////////////////////////////////////////////////  PUBLIC
 //---------------------------------------------------- Fonctions publiques
 
-void BarriereEntree(TypeBarriere barr, unsigned int semMP, unsigned int semSync, unsigned int semCompteur, unsigned int boiteAL, unsigned int MPReq, unsigned int MPPark, unsigned int MPCompteur)
+void BarriereEntree(TypeBarriere barr, unsigned int semMP, unsigned int semSync, unsigned int semCompteur, unsigned int semPark, unsigned int boiteAL, unsigned int MPReq, unsigned int MPPark, unsigned int MPCompteur)
 // Mode d'emploi :
 //
 // Contrat :
