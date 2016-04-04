@@ -23,7 +23,7 @@
 //------------------------------------------------------ Include personnel
 #include "Mere.h"
 #include "GestionMenu.h"
-//#include "BarriereEntree.h"
+#include "BarriereEntree.h"
 #include "BarriereSortie.h"
 #include "Outils.h"
 #include "Heure.h"
@@ -92,27 +92,27 @@ int main()
 
 	if((gestionMenu = fork()) == 0)
 	{
-		//GestionMenu();
+		GestionMenu(arriveeVoiture[1], arriveeVoiture[0], arriveeVoiture[2], sortieVoiture);
 	}
 	else
 	{
 		if((barrieresEntree[0] = fork()) == 0)
 		{
-			//BarriereEntree(PROF_BLAISE_PASCAL, semRequete[0], autorisation[0], semCpt, semParking, arriveeVoiture[0], requete[0], parking, compteur);
+			BarriereEntree(PROF_BLAISE_PASCAL, semRequete[0], autorisation[0], semCpt, semParking, arriveeVoiture[0], requete[0], parking, compteurVoiture);
 			exit(0);
 		}
 		else
 		{
 			if((barrieresEntree[1] = fork()) == 0)
 			{
-				//BarriereEntree(AUTRE_BLAISE_PASCAL, semRequete[1], autorisation[1], semCpt, semParking, arriveeVoiture[1], requete[1], parking, compteur);
+				BarriereEntree(AUTRE_BLAISE_PASCAL, semRequete[1], autorisation[1], semCpt, semParking, arriveeVoiture[1], requete[1], parking, compteurVoiture);
 				exit(0);
 			}
 			else
 			{
 				if((barrieresEntree[2] = fork()) == 0)
 				{
-					//BarriereEntree(ENTREE_GASTON_BERGER, semRequete[2], autorisation[2], semCpt, semParking, arriveeVoiture[2], requete[2], parking, compteur);
+					BarriereEntree(ENTREE_GASTON_BERGER, semRequete[2], autorisation[2], semCpt, semParking, arriveeVoiture[2], requete[2], parking, compteurVoiture);
 					exit(0);
 				}
 				else
@@ -125,6 +125,7 @@ int main()
 					else
 					{
 						heure = ActiverHeure();
+						sleep(10);
 						waitpid(gestionMenu, NULL, 0);
 						kill(barrieresEntree[0], SIGUSR2);
 						waitpid(barrieresEntree[0], NULL, 0);
