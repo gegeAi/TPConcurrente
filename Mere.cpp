@@ -72,25 +72,32 @@ int main()
 	int semRequete[3];
 	int semParking;
 
-	parking = shmget(ftok(REFERENCE, 1), sizeof(Voiture)*8, IPC_CREAT | 0660);
-	sortieVoiture = msgget(ftok(REFERENCE, 2), IPC_CREAT | 0660);
-	compteurVoiture = shmget(ftok(REFERENCE, 3), sizeof(int), IPC_CREAT | 0660);
-	semCpt = semget(ftok(REFERENCE, 4), 1, IPC_CREAT | 0660);
-	semParking = semget(ftok(REFERENCE, 5), 1, IPC_CREAT | 0660);
+	parking = shmget(ftok(REFERENCE, 1), sizeof(Voiture)*8, IPC_CREAT | DROITS);
+	sortieVoiture = msgget(ftok(REFERENCE, 2), IPC_CREAT | DROITS);
+	compteurVoiture = shmget(ftok(REFERENCE, 3), sizeof(int), IPC_CREAT | DROITS);
+	semCpt = semget(ftok(REFERENCE, 4), 1, IPC_CREAT | DROITS);
+	semParking = semget(ftok(REFERENCE, 5), 1, IPC_CREAT | DROITS);
 	semctl(semCpt, 0, SETVAL, 1);
 	semctl(semParking, 0, SETVAL, 1);
 	for(int i=0; i<3; i++)
 	{
-		arriveeVoiture[i] = msgget(ftok(REFERENCE, 6+i), IPC_CREAT | 0660);
-		requete[i] = shmget(ftok(REFERENCE, 9+i), sizeof(Requete), IPC_CREAT | 0660);
-		autorisation[i] = semget(ftok(REFERENCE, 12+i), 1, IPC_CREAT | 0660);
-		semRequete[i] = semget(ftok(REFERENCE, 15+i), 1, IPC_CREAT | 0660);
+		arriveeVoiture[i] = msgget(ftok(REFERENCE, 6+i), IPC_CREAT | DROITS);
+		requete[i] = shmget(ftok(REFERENCE, 9+i), sizeof(Requete), IPC_CREAT | DROITS);
+		autorisation[i] = semget(ftok(REFERENCE, 12+i), 1, IPC_CREAT | DROITS);
+		semRequete[i] = semget(ftok(REFERENCE, 15+i), 1, IPC_CREAT | DROITS);
 		semctl(autorisation[i], 0, SETVAL, 1);
 		semctl(semRequete[i], 0, SETVAL, 1);
 	}
 	
 	Voiture * leParking = (Voiture *) shmat(parking,NULL,0);
 	leParking = new Voiture[8];
+
+	Voiture * park = (Voiture *) shmat(parking, NULL, 0);
+	for(int i=0; i<8; i++)
+	{
+		park[i].num=-1;
+	}
+	shmdt(park);
 
 	int * cpt = (int *) shmat(compteurVoiture, NULL, 0);
 	*cpt=8;
