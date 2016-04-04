@@ -98,7 +98,7 @@ void end(int noSignal)
 {
 	for(int i=0; i<8; i++)
 	{
-		if(pidFils != 0)
+		if(pidFils[i] != 0)
 		{
 			kill(pidFils[i], SIGUSR2);
 			waitpid(pidFils[i], NULL, 0); 
@@ -118,12 +118,12 @@ void end(int noSignal)
 
 void finNormale(int noSignal)
 {
-	Voiture v = parking[noSignal];
+	Voiture v = parking[noSignal-1];
 	AfficherSortie(v.type, v.num, v.hEntree, v.hSortie);
 	semop(semCompteur, &reserver, 1);
 	*compteur++;
 	semop(semCompteur, &liberer, 1);
-	pidFils[noSignal]=0;
+	pidFils[noSignal-1]=0;
 	checkAutorisations();
 	
 }
@@ -136,7 +136,6 @@ void BarriereSortie(int idParking, int idRequete[], int idAutorisation[], int id
 
 	semCompteur = semCpt;
 	semPark = semParking;
-	
 
 	//handler terminaison
 	struct sigaction termine;
