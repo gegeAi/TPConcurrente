@@ -10,23 +10,24 @@
 //---------------------------------------------------------------- INCLUDE
 
 //-------------------------------------------------------- Include système
-using namespace std;
+
 #include <iostream>
 #include <signal.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <time.h>
-#include <sys/msg.h>
+
 #include <sys/types.h>
 #include <sys/ipc.h>
-
+#include <sys/msg.h>
+#include <errno.h>
 //------------------------------------------------------ Include personnel
 #include "GestionMenu.h"
 #include "Menu.h"
 
 #include "Outils.h"
 #include "Config.h"
-
+using namespace std;
 ///////////////////////////////////////////////////////////////////  PRIVE
 //------------------------------------------------------------- Constantes
 
@@ -45,7 +46,7 @@ static int id_balProfs;
 static int id_balAutres;
 static int id_balGB;
 static int id_balSortie;
-static Voiture nouveau;
+static messVoiture nouveau;
 
 //------------------------------------------------------ Fonctions privées
 //static type nom ( liste de paramètres )
@@ -81,7 +82,7 @@ static void init(unsigned int balAutres, unsigned int balProfs, unsigned int bal
 	id_balGB = balGB;
 	id_balSortie = balSortie;
 	
-    nouveau.num = 0;
+    nouveau.mVoiture.num = 0;
 
 }// fin de init
 
@@ -125,15 +126,17 @@ void Commande( char code, unsigned int valeur)
 		case 'P' :
 		{
 			
-			nouveau.type = PROF;
-			nouveau.hEntree = time(NULL);
-			nouveau.hSortie = 0;
-			nouveau.num = (nouveau.num+1)%1000;
-			nouveau.mtype = 0;
+			nouveau.mVoiture.type = PROF;
+			nouveau.mVoiture.hEntree = time(NULL);
+			nouveau.mVoiture.hSortie = 0;
+			nouveau.mVoiture.num = (nouveau.mVoiture.num+1)%1000;
+			nouveau.mtype = 1;
+
 			
 			if(valeur == 1)
 			{									
-				msgsnd(id_balProfs,&nouveau,TAILLE_MSG_VOITURE,IPC_NOWAIT);
+				msgsnd(id_balProfs,&nouveau,sizeof(nouveau.mVoiture),IPC_NOWAIT);
+				Afficher(MESSAGE, errno);
 			}
 			else
 			{
@@ -145,11 +148,11 @@ void Commande( char code, unsigned int valeur)
 		case 'A' :
 		{
 		
-			nouveau.type = AUTRE;
-			nouveau.hEntree = time(NULL);
-			nouveau.hSortie = 0;
-			nouveau.num = (nouveau.num+1)%1000;
-			nouveau.mtype = 0;
+			nouveau.mVoiture.type = AUTRE;
+			nouveau.mVoiture.hEntree = time(NULL);
+			nouveau.mVoiture.hSortie = 0;
+			nouveau.mVoiture.num = (nouveau.mVoiture.num+1)%1000;
+			nouveau.mtype = 1;
 			
 			if(valeur == 1)
 			{			
