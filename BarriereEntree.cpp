@@ -61,12 +61,12 @@ static void ITFinFils(noSig)
 {
 	int place;
 	
-	waitpid(noFils, &place, 0);
+	/*//waitpid(noFils, &place, 0);
 	semop(id_se, &semP,1 );
 	*(parking+(place-1)) = newCar;
 	semop(id_sem, &semV,1 );
 	
-	AfficherPlace(numPlace, typeUsager, numVoiture, tempsArrivee);
+	AfficherPlace(numPlace, typeUsager, numVoiture, tempsArrivee);*/
 }
 
 static void init(const char nomBal)
@@ -138,27 +138,46 @@ void BarriereEntree(TypeBarriere barr, unsigned int semMP, unsigned int semSync,
 		while(msgrcv(id_bal, &newCar, TAILLE_MSG_VOITURE, 0, 0) == -1 && errno == EINTR);
 		
 		semop(id_sem, &semP,1 );
+		if(*(compteurPlace)>0)
+		{
+			*(compteurPlace)--;
+			semop(id_sem, &semV,1 );
+			pid_t voiturier = GarerVoiture(barriere);
+			int place;
+			waitpid(noFils, &place, 0);
+			*(parking+(place-1)) = newCar;
+			
+			
+		}
+		else
+		{
+			semop(id_sem, &semV,1 );
+			
+			semop(id_sem, &semP,1 );
+			voiturePresente = true;
+			semop(id_sem, &semV,1 );
 		
-		semop(id_sem, &semV,1 );
+			
+			// Demande de garage
+			semop(id_sem, &semP,1 );
+			while(shmat(id_mpReq, &newCar) == -1 && errno == EINTR);
+			semop(id_sem, &semV,1 );
+			
+			// Attente de l'autorisation de garage
+			semop(id_semSync, &semP,1 );
+			
+			*(compteurPlace)--;
+			semop(id_sem, &semV,1 );
+			pid_t voiturier = GarerVoiture(barriere);
+			int place;
+			waitpid(noFils, &place, 0);
+			*(parking+(place-1)) = newCar;
+		}
+		
 		
 		//AfficherRequete(barriere, newCar.type, newCar.hEntree);
 		
 		
-		semop(id_sem, &semP,1 );
-		voiturePresente = true;
-		semop(id_sem, &semV,1 );
-		
-		
-		// Demande de garage
-		semop(id_sem, &semP,1 );
-		while(shmat(id_mpReq, &newCar) == -1 && errno == EINTR);
-		semop(id_sem, &semV,1 );
-		
-		// Attente de l'autorisation de garage
-		semop(id_semSync, &semP,1 );
-		while(GarerVoiture(barriere) == -1);
-		
-		sleep(1);
 		
 		
 	}
