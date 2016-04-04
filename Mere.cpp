@@ -125,7 +125,6 @@ int main()
 					else
 					{
 						heure = ActiverHeure();
-						sleep(10);
 						waitpid(gestionMenu, NULL, 0);
 						kill(barrieresEntree[0], SIGUSR2);
 						waitpid(barrieresEntree[0], NULL, 0);
