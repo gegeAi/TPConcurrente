@@ -76,40 +76,43 @@ int main()
 	compteurVoiture = shmget(ftok(REFERENCE, 3), sizeof(int), IPC_CREAT | IPC_EXCL | DROITS);
 	semCpt = semget(ftok(REFERENCE, 4), 1, IPC_CREAT | IPC_EXCL | DROITS);
 	semParking = semget(ftok(REFERENCE, 5), 1, IPC_CREAT | IPC_EXCL | DROITS);
+	semctl(semCpt, SETVAL, 1);
+	semctl(semParking, SETVAL, 1);
 	for(int i=0; i<3; i++)
 	{
 		arriveeVoiture[i] = msgget(ftok(REFERENCE, 6+i), IPC_CREAT | IPC_EXCL | DROITS);
 		requete[i] = shmget(ftok(REFERENCE, 9+i), sizeof(Requete), IPC_CREAT | IPC_EXCL | DROITS);
 		autorisation[i] = semget(ftok(REFERENCE, 12+i), 1, IPC_CREAT | IPC_EXCL | DROITS);
 		semRequete[i] = semget(ftok(REFERENCE, 15+i), 1, IPC_CREAT | IPC_EXCL | DROITS);
+		semctl(autorisation[i], SETVAL, 1);
+		semctl(semRequete[i], SETVAL, 1);
 	}
 
 	//creation taches
 
 	if((gestionMenu = fork()) == 0)
 	{
-		GestionMenu();
+		//GestionMenu();
 	}
 	else
 	{
 		if((barrieresEntree[0] = fork()) == 0)
 		{
-			//BarriereEntree(PROF_BLAISE_PASCAL, unsigned int semMP, autorisation[0], semCpt, arriveeVoiture[0], requete[0], parking, compteur);
-			void BarriereEntree(, unsigned int semPark, unsigned int boiteAL
+			//BarriereEntree(PROF_BLAISE_PASCAL, semRequete[0], autorisation[0], semCpt, semParking, arriveeVoiture[0], requete[0], parking, compteur);
 			exit(0);
 		}
 		else
 		{
 			if((barrieresEntree[1] = fork()) == 0)
 			{
-				//BarriereEntree(AUTRE_BLAISE_PASCAL, unsigned int semMP, autorisation[1], semCpt, arriveeVoiture[1], requete[1], parking, compteur);
+				//BarriereEntree(AUTRE_BLAISE_PASCAL, semRequete[1], autorisation[1], semCpt, semParking, arriveeVoiture[1], requete[1], parking, compteur);
 				exit(0);
 			}
 			else
 			{
 				if((barrieresEntree[2] = fork()) == 0)
 				{
-					//BarriereEntree(ENTREE_GASTON_BERGER, unsigned int semMP, autorisation[2], semCpt, arriveeVoiture[2], requete[2], parking, compteur);
+					//BarriereEntree(ENTREE_GASTON_BERGER, semRequete[2], autorisation[2], semCpt, semParking, arriveeVoiture[2], requete[2], parking, compteur);
 					exit(0);
 				}
 				else

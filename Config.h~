@@ -10,22 +10,23 @@ struct Voiture
 {
 	TypeUsager type;
 	int num;
-	int hEntree, hSortie, cout;
+	int hEntree, hSortie;
 };	
+
 static const int TAILLE_MSG_VOITURE = sizeof(Voiture);
 
 typedef struct Requete Requete;
 struct Requete
 {
-	char type;
+	TypeUsager type;
 	int hRequete;
 };
 
-typedef struct msgBaL msgBaL
+typedef struct msgBaL msgBaL;
 struct msgBal
 {
 	long type;
-	Voiture msg[1];
+	int place[1];
 };
 	
 #endif

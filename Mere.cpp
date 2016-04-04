@@ -76,19 +76,23 @@ int main()
 	compteurVoiture = shmget(ftok(REFERENCE, 3), sizeof(int), IPC_CREAT | IPC_EXCL | DROITS);
 	semCpt = semget(ftok(REFERENCE, 4), 1, IPC_CREAT | IPC_EXCL | DROITS);
 	semParking = semget(ftok(REFERENCE, 5), 1, IPC_CREAT | IPC_EXCL | DROITS);
+	semctl(semCpt, 0, SETVAL, 1);
+	semctl(semParking, 0, SETVAL, 1);
 	for(int i=0; i<3; i++)
 	{
 		arriveeVoiture[i] = msgget(ftok(REFERENCE, 6+i), IPC_CREAT | IPC_EXCL | DROITS);
 		requete[i] = shmget(ftok(REFERENCE, 9+i), sizeof(Requete), IPC_CREAT | IPC_EXCL | DROITS);
 		autorisation[i] = semget(ftok(REFERENCE, 12+i), 1, IPC_CREAT | IPC_EXCL | DROITS);
 		semRequete[i] = semget(ftok(REFERENCE, 15+i), 1, IPC_CREAT | IPC_EXCL | DROITS);
+		semctl(autorisation[i], 0, SETVAL, 1);
+		semctl(semRequete[i], 0, SETVAL, 1);
 	}
 
 	//creation taches
 
 	if((gestionMenu = fork()) == 0)
 	{
-		GestionMenu();
+		//GestionMenu();
 	}
 	else
 	{
