@@ -18,9 +18,13 @@ using namespace std;
 #include <sys/msg.h>
 #include <sys/types.h>
 #include <sys/ipc.h>
+#include <sys/wait.h>
+#include <errno.h>
+#include <sys/sem.h>
+#include <sys/shm.h>
 //------------------------------------------------------ Include personnel
 #include "BarriereEntree.h"
-#include "Config.h"
+
 #include "Outils.h"
 
 
@@ -37,9 +41,9 @@ static int id_mpParking;
 static int id_mpCompteur;
 static int numMemoire;
 static TypeBarriere barriere;
-static Voiture n ;
+static Voiture newCar ;
 static Voiture * parking;
-static bool * voiturePresente;
+static Requete * voiturePresente;
 static unsigned int * compteurPlace;
 static pid_t noFils;
 //operation p
@@ -54,12 +58,12 @@ struct sembuf semV = {0, 1,0};
 
 //----------------------------------------------------- Méthodes publiques
 
-static void ITFin(noSig)
+static void ITFin(int noSig)
 {
 	
 }
 
-static void ITFinFils(noSig)
+static void ITFinFils(int noSig)
 {
 	int place;
 	
@@ -71,7 +75,7 @@ static void ITFinFils(noSig)
 	AfficherPlace(numPlace, typeUsager, numVoiture, tempsArrivee);*/
 }
 
-static void init(const char nomBal)
+static void init(TypeBarriere barr, unsigned int semMP, unsigned int semSync, unsigned int semCompteur, unsigned int semPark,  unsigned int boiteAL, unsigned int MPReq, unsigned int MPPark, unsigned int MPCompteur)
 {
 	//masquage de SIGUSR1 et SIGUSR2
 	struct sigaction masquage;
@@ -144,7 +148,7 @@ static void init(const char nomBal)
  */
 void BarriereEntree(TypeBarriere barr, unsigned int semMP, unsigned int semSync, unsigned int semCompteur, unsigned int semPark,  unsigned int boiteAL, unsigned int MPReq, unsigned int MPPark, unsigned int MPCompteur)
 {
-	init(TypeBarriere barr, unsigned int semMP, unsigned int semSync, unsigned int semCompteur, unsigned int semPark, unsigned int boiteAL, unsigned int MPReq, unsigned int MPPark, unsigned int MPCompteur);
+	init(barr, semMP, semSync, semCompteur, semPark, boiteAL, MPReq, MPPark, MPCompteur);
 	
 	for(;;)
 	{
@@ -172,16 +176,15 @@ void BarriereEntree(TypeBarriere barr, unsigned int semMP, unsigned int semSync,
 			semop(id_semCompt, &semV,1 );
 			
 			//Depot de la requête
-			semop(id_sem, &semP,1 );
+			semop(id_semReq, &semP,1 );
 			voiturePresente[numMemoire].type = newCar.type;
 			voiturePresente[numMemoire].hRequete = newCar.hEntree;
-			semop(id_sem, &semV,1 );
+			semop(id_semReq, &semV,1 );
 		
 			
 			// Demande de garage
-			semop(id_sem, &semP,1 );
-			while(shmat(id_mpReq, &newCar) == -1 && errno == EINTR);
-			semop(id_sem, &semV,1 );
+			semop(id_semSync, &semP,1 );
+
 			
 			// Attente de l'autorisation de garage
 			semop(id_semSync, &semP,1 );

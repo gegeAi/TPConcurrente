@@ -59,7 +59,7 @@ static Voiture nouveau;
 //} //----- fin de nom
 
 
-static void init()
+static void init(unsigned int balAutres, unsigned int balProfs, unsigned int balGB, unsigned int balSortie)
 // Mode d'emploi :
 //
 // Contrat :
@@ -77,7 +77,7 @@ static void init()
 
 	//Recuperation des boites aux lettre
 	id_balAutres = balAutres;
-	id_balProfs balProfs;
+	id_balProfs = balProfs;
 	id_balGB = balGB;
 	id_balSortie = balSortie;
 	
@@ -99,7 +99,7 @@ void GestionMenu(unsigned int balAutres, unsigned int balProfs, unsigned int bal
 // Algorithme :
 //
 {
-	init(unsigned int balAutres, unsigned int balProfs, unsigned int balGB, unsigned int balSortie);
+	init(balAutres, balProfs, balGB, balSortie);
 	
 	for(;;)
 	{
