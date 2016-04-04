@@ -3,7 +3,7 @@ RM = rm
 EDL = g++
 COMP = g++
 ECHO = @echo
-INT = Mere.h GestionMenu.h BarriereSortie.h
+INT = Mere.h GestionMenu.h BarriereSortie.h BarriereEntree.h
 REAL = $(INT:.h=.cpp)
 OBJ = $(INT:.h=.o)
 OUTPUT = -o
@@ -21,6 +21,9 @@ GestionMenu.o : GestionMenu.cpp
 
 BarriereSortie.o : BarriereSortie.cpp
 	$(COMP) $(CPPFLAGS) -c BarriereSortie.cpp
+
+BarriereEntree.o : BarriereEntree.cpp
+	$(COMP) $(CPPFLAGS) -c BarriereEntree.cpp
 
 $(CLEAN):
 	$(RM) $(RMFLAGS) $(EXE) $(OBJ) core

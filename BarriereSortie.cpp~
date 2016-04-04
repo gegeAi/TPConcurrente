@@ -46,13 +46,15 @@ static struct sembuf reserver = {0, -1, 0};
 static struct sembuf liberer = {0, 1, 0};
 static int semCompteur;
 static int semPark;
+static int semReq[3];
+static int idAuto[3];
 
-void checkAutorisations(int semRequete, int idAutorisation[])
+void checkAutorisations()
 {
-	int nChoisi = -1;
 	if(*compteur < 3)
 	{
-		for(int i=0; i<*compteur; i++)
+		int nChoisi = -1;
+		for(int j=0; j<*compteur; j++)
 		{
 			for(int i=0; i<3; i++)
 			{
@@ -60,13 +62,27 @@ void checkAutorisations(int semRequete, int idAutorisation[])
 				{
 					nChoisi = i;
 				}
-				else if(nChoisi != -1 && requete
+				else if(nChoisi != -1 && requete[i] != NULL)
+				{
+					if(requete[i]->type==PROF)
+					{
+						if(requete[nChoisi]->type!=PROF || (requete[nChoisi]->type==PROF && requete[i]->hRequete < requete[nChoisi]->hRequete))
+						{
+							nChoisi = i;
+						}
+					}
+				}
 			}
+			semop(semReq[nChoisi], &reserver, 1);
+			requete[nChoisi]=NULL;
+			semop(semReq[nChoisi], &liberer, 1);
+			semop(idAuto[nChoisi], &liberer, 1);
+			
 		}
 	}
 }
 
-void run(int idAutorisation[], int idSortieVoiture, int semRequete[])
+void run(int idSortieVoiture)
 {
 	
 	while(true)
@@ -108,6 +124,7 @@ void finNormale(int noSignal)
 	*compteur++;
 	semop(semCompteur, &liberer, 1);
 	pidFils[noSignal]=0;
+	checkAutorisations();
 	
 }
 
@@ -119,6 +136,7 @@ void BarriereSortie(int idParking, int idRequete[], int idAutorisation[], int id
 
 	semCompteur = semCpt;
 	semPark = semParking;
+	
 
 	//handler terminaison
 	struct sigaction termine;
@@ -137,8 +155,11 @@ void BarriereSortie(int idParking, int idRequete[], int idAutorisation[], int id
 	for(int i=0; i<3; i++)
 	{
 		requete[i] = (Requete*) shmat(idRequete[i], NULL, 0);
+		semReq[i] = semRequete[i];
+		idAuto[i] = idAutorisation[i];
 	}
 
+	run(idSortieVoiture);
 
 	// detachement	
 	shmdt(parking);

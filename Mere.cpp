@@ -141,7 +141,7 @@ int main()
 				}// else barriereEntree2
 			}// else barriereEntree1
 		}// else barriereEntree0
-	}// else getionMenu
+	}// else gestionMenu
 
 	//destruction ipcs
 	shmctl(parking, IPC_RMID, NULL);
