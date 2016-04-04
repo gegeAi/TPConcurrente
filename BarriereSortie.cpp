@@ -47,12 +47,26 @@ static struct sembuf liberer = {0, 1, 0};
 static int semCompteur;
 static int semPark;
 
-void checkAutorisations()
+void checkAutorisations(int semRequete, int idAutorisation[])
 {
-	
+	int nChoisi = -1;
+	if(*compteur < 3)
+	{
+		for(int i=0; i<*compteur; i++)
+		{
+			for(int i=0; i<3; i++)
+			{
+				if(nChoisi == -1 && requete[i] != NULL)
+				{
+					nChoisi = i;
+				}
+				//else if(nChoisi != -1 && requete
+			}
+		}
+	}
 }
 
-void run(int idAutorisation[], int idSortieVoiture, int semParking, int semRequete[], int semCpt)
+void run(int idAutorisation[], int idSortieVoiture, int semRequete[])
 {
 	
 	while(true)
@@ -93,9 +107,6 @@ void finNormale(int noSignal)
 	semop(semCompteur, &reserver, 1);
 	*compteur++;
 	semop(semCompteur, &liberer, 1);
-	semop(semPark, &reserver, 1);
-	parking[noSignal]=NULL;
-	semop(semPark, &liberer, 1);
 	pidFils[noSignal]=0;
 	
 }
