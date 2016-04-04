@@ -17,7 +17,7 @@ static const int TAILLE_MSG_VOITURE = sizeof(Voiture);
 typedef struct Requete Requete;
 struct Requete
 {
-	char type;
+	TypeUsager type;
 	int hRequete;
 };
 
