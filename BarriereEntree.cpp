@@ -152,13 +152,13 @@ void BarriereEntree(TypeBarriere barr, unsigned int semMP, unsigned int semSync,
 	
 	for(;;)
 	{
-		
 		//Recuperation du message
 		while(msgrcv(id_bal, &newCar, TAILLE_MSG_VOITURE, 0, 0) == -1);
-		Afficher(MESSAGE, "lol lol");
+		
 		semop(id_semCompt, &semP,1 );
 		if(*(compteurPlace)>0)
 		{
+			
 			*(compteurPlace)--;
 			semop(id_semCompt, &semV,1 );
 			
