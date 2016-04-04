@@ -98,11 +98,11 @@ void end(int noSignal)
 {
 	for(int i=0; i<8; i++)
 	{
-		if(pidFils != 0)
+		/*if(pidFils != 0)
 		{
 			kill(pidFils[i], SIGUSR2);
 			waitpid(pidFils[i], NULL, 0); 
-		}
+		}*/
 	}
 
 	// detachement	
