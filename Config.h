@@ -8,9 +8,11 @@ static const int DROITS = 0660;
 typedef struct Voiture Voiture;
 struct Voiture
 {
+	long mtype;
 	TypeUsager type;
 	int num;
 	int hEntree, hSortie;
+	
 };	
 
 static const int TAILLE_MSG_VOITURE = sizeof(Voiture);

@@ -119,23 +119,25 @@ void Commande( char code, unsigned int valeur)
 	{
 		case 'E' :
 		{
+			Afficher(MESSAGE, "lol lol");
 			exit(0);
 		}
 		case 'P' :
 		{
+			
 			nouveau.type = PROF;
 			nouveau.hEntree = time(NULL);
 			nouveau.hSortie = 0;
-			nouveau.cout = 0;
 			nouveau.num = (nouveau.num+1)%1000;
+			nouveau.mtype = 0;
 			
 			if(valeur == 1)
 			{									
-				msgsnd(id_balProfs,&nouveau,TAILLE_MSG_VOITURE,0);
+				msgsnd(id_balProfs,&nouveau,TAILLE_MSG_VOITURE,IPC_NOWAIT);
 			}
 			else
 			{
-				msgsnd(id_balGB,&nouveau,TAILLE_MSG_VOITURE,0);
+				msgsnd(id_balGB,&nouveau,TAILLE_MSG_VOITURE,IPC_NOWAIT);
 
 			}
 			break;
@@ -146,24 +148,24 @@ void Commande( char code, unsigned int valeur)
 			nouveau.type = AUTRE;
 			nouveau.hEntree = time(NULL);
 			nouveau.hSortie = 0;
-			nouveau.cout = 0;
 			nouveau.num = (nouveau.num+1)%1000;
+			nouveau.mtype = 0;
 			
 			if(valeur == 1)
 			{			
-				msgsnd(id_balAutres,&nouveau,TAILLE_MSG_VOITURE,0);
+				msgsnd(id_balAutres,&nouveau,TAILLE_MSG_VOITURE,IPC_NOWAIT);
 
 			}
 			else
 			{
 		
-				msgsnd(id_balGB,&nouveau,TAILLE_MSG_VOITURE,0);
+				msgsnd(id_balGB,&nouveau,TAILLE_MSG_VOITURE,IPC_NOWAIT);
 			}
 			break;
 		}
 		case 'S' :
 		{
-			msgsnd(id_balSortie,&valeur,TAILLE_MSG_VOITURE,0);
+			msgsnd(id_balSortie,&valeur,TAILLE_MSG_VOITURE,IPC_NOWAIT);
 			break;
 		}
 	}

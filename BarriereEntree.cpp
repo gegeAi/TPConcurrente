@@ -60,7 +60,7 @@ struct sembuf semV = {0, 1,0};
 
 static void ITFin(int noSig)
 {
-	
+	exit(0);
 }
 
 static void ITFinFils(int noSig)
@@ -154,8 +154,8 @@ void BarriereEntree(TypeBarriere barr, unsigned int semMP, unsigned int semSync,
 	{
 		
 		//Recuperation du message
-		while(msgrcv(id_bal, &newCar, TAILLE_MSG_VOITURE, 0, 0) == -1 && errno == EINTR);
-		
+		while(msgrcv(id_bal, &newCar, TAILLE_MSG_VOITURE, 0, 0) == -1);
+		Afficher(MESSAGE, "lol lol");
 		semop(id_semCompt, &semP,1 );
 		if(*(compteurPlace)>0)
 		{
