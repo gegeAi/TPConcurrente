@@ -89,7 +89,7 @@ void checkAutorisations()
 
 void finNormale(int noPlace)
 {
-	Voiture v = parking[noPlace-1];
+	Voiture v = parking[noPlace];
 	AfficherSortie(v.type, v.num, v.hEntree, v.hSortie);
 	while(semop(semCompteur, &reserver, 1)==-1);
 	(*compteur)++;
@@ -104,14 +104,9 @@ void run(int idSortieVoiture)
 	{
 		msgBaL * lecture = new msgBaL();
 		msgrcv(idSortieVoiture, lecture, sizeof(int), 1, 0);
-		while(semop(semPark, &reserver, 1)==-1);
-		if(parking[lecture->place[0]].num != -1)
-		{
-			currentSortie = SortirVoiture(lecture->place[0]);
-		}
-		while(semop(semPark, &liberer, 1)==-1);	
-		int place;	
-		waitpid(currentSortie, &place, 0);
+		currentSortie = SortirVoiture(lecture->place[0]);
+		int place=lecture->place[0];	
+		//waitpid(currentSortie, &place, 0);
 		finNormale(place);
 		currentSortie=0;
 		delete lecture;	
