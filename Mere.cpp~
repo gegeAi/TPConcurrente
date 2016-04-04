@@ -93,39 +93,39 @@ int main()
 	if((gestionMenu = fork()) == 0)
 	{
 		GestionMenu(arriveeVoiture[1], arriveeVoiture[0], arriveeVoiture[2], sortieVoiture);
+		//exit(0);
 	}
 	else
 	{
 		if((barrieresEntree[0] = fork()) == 0)
 		{
 			BarriereEntree(PROF_BLAISE_PASCAL, semRequete[0], autorisation[0], semCpt, semParking, arriveeVoiture[0], requete[0], parking, compteurVoiture);
-			exit(0);
+			//exit(0);
 		}
 		else
 		{
 			if((barrieresEntree[1] = fork()) == 0)
 			{
 				BarriereEntree(AUTRE_BLAISE_PASCAL, semRequete[1], autorisation[1], semCpt, semParking, arriveeVoiture[1], requete[1], parking, compteurVoiture);
-				exit(0);
+				//exit(0);
 			}
 			else
 			{
 				if((barrieresEntree[2] = fork()) == 0)
 				{
 					BarriereEntree(ENTREE_GASTON_BERGER, semRequete[2], autorisation[2], semCpt, semParking, arriveeVoiture[2], requete[2], parking, compteurVoiture);
-					exit(0);
+					//exit(0);
 				}
 				else
 				{
 					if((barriereSortie = fork()) == 0)
 					{
 						BarriereSortie(parking, requete, autorisation, sortieVoiture, semParking, semRequete, compteurVoiture, semCpt);
-						exit(0);
+						//exit(0);
 					}
 					else
 					{
 						heure = ActiverHeure();
-						sleep(10);
 						waitpid(gestionMenu, NULL, 0);
 						kill(barrieresEntree[0], SIGUSR2);
 						waitpid(barrieresEntree[0], NULL, 0);
@@ -137,28 +137,30 @@ int main()
 						waitpid(barriereSortie, NULL, 0);
 						kill(heure, SIGUSR2);
 						waitpid(heure, NULL, 0);
+
+						//destruction ipcs
+						shmctl(parking, IPC_RMID, NULL);
+						msgctl(sortieVoiture, IPC_RMID, NULL);
+						shmctl(compteurVoiture, IPC_RMID, NULL);
+						semctl(semCpt, 0, IPC_RMID);
+						semctl(semParking, 0, IPC_RMID);
+
+						for(int i=0; i<3; i++)
+						{
+							msgctl(arriveeVoiture[i], IPC_RMID, NULL);
+							shmctl(requete[i], IPC_RMID, NULL);
+							semctl(semRequete[i], 0, IPC_RMID);
+							semctl(autorisation[i], 0, IPC_RMID);
+						}
+
+						TerminerApplication(true);
 					} // else barriereSortie
 				}// else barriereEntree2
 			}// else barriereEntree1
 		}// else barriereEntree0
-	}// else getionMenu
+	}// else gestionMenu
 
-	//destruction ipcs
-	shmctl(parking, IPC_RMID, NULL);
-	msgctl(sortieVoiture, IPC_RMID, NULL);
-	shmctl(compteurVoiture, IPC_RMID, NULL);
-	semctl(semCpt, 0, IPC_RMID);
-	semctl(semParking, 0, IPC_RMID);
-
-	for(int i=0; i<3; i++)
-	{
-		msgctl(arriveeVoiture[i], IPC_RMID, NULL);
-		shmctl(requete[i], IPC_RMID, NULL);
-		semctl(semRequete[i], 0, IPC_RMID);
-		semctl(autorisation[i], 0, IPC_RMID);
-	}
-
-	TerminerApplication(true);
+	
 	
 	return 0;
 }
