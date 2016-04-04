@@ -5,17 +5,6 @@
 static const char * REFERENCE = "./keyB3130"; 
 static const int DROITS = 0660;
 
-
-enum SemUsg
-{
-	PARKING,
-	REQUETE,
-	CPT,
-	AUTO1,
-	AUTO2, 
-	AUTO3
-};
-
 typedef struct Voiture Voiture;
 struct Voiture
 {
