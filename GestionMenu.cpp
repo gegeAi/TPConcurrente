@@ -120,7 +120,7 @@ void Commande( char code, unsigned int valeur)
 	{
 		case 'E' :
 		{
-			Afficher(MESSAGE, "lol lol");
+			
 			exit(0);
 		}
 		case 'P' :

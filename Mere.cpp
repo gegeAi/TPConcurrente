@@ -88,6 +88,9 @@ int main()
 		semctl(autorisation[i], 0, SETVAL, 1);
 		semctl(semRequete[i], 0, SETVAL, 1);
 	}
+	
+	Voiture * leParking = (Voiture *) shmat(parking,NULL,0);
+	leParking = new Voiture[8];
 
 	int * cpt = (int *) shmat(compteurVoiture, NULL, 0);
 	*cpt=8;
