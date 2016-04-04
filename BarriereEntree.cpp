@@ -28,14 +28,17 @@ using namespace std;
 
 //---------------------------------------------------- Variables de classe
 static int id_bal;
-static int id_sem;
+static int id_semMP;
 static int id_semSync;
+static int id_semCompt;
 static int id_mpReq;
 static int id_mpParking;
+static int id_mpCompteur;
 static TypeBarriere barriere;
-static Voiture newCar;
+static Voiture n ;
 static Voiture * parking;
 static bool * voiturePresente;
+static unsigned int * compteurPlace;
 static pid_t noFils;
 //operation p
 struct sembuf semP = {0, -1,0};
@@ -91,42 +94,39 @@ static void init(const char nomBal)
 	sigaction (SIGCHLD, &action2, NULL);
 	
 	//récupération de la boîte aux lettres
-    key_t clefBAL = ftok(REFERENCE, numBal);
-    id_bal = msgget(clefBAL, 0660);
+    id_bal = boiteAL;
     
     //récupération du sémaphore sur MP req
-    key_t clefSem = ftok("Req",1);
-    id_sem = semget(clefSem,1);
+    id_semMP = semMP;
     
     //récupération du sémaphore de synchro
-    key_t clefSem = ftok("Synchro",1);
-    id_semSync = semget(clefSem,1);
+    id_semSync = semSync;
+    
+    //récup sémaphore de compteur
+    id_semCompt = semCompteur;
     
     
     //récupération mémoires partagées
-    key_t clefMPReq = ftok(REFERENCE, 6);
-    id_mpReq = shmget(clefMPReq,1);
-    
-    void *  mP_req = shmat(id_mpReq,NULL,0);
-    voiturePresente = (bool *) mP_req;
+    id_mpReq = MPReq;
+    voiturePresente = (bool *) shmat(id_mpReq,NULL,0);
     
     semop(id_sem, &semP,1 );
 	voiturePresente = false;
 	semop(id_sem, &semV,1 );
     
-    key_t clefMPParking = ftok(REFERENCE, 1);
-    id_mpParking = shmget(clefMPParking,1);
+    id_mpParking = MPPark;
+    parking = (Voiture *) shmat(id_mpParking,NULL,0);
     
-    void *  mP_Park = shmat(id_mpParking,NULL,0);
-    parking = (Voiture *) mP_Park;
+    id_mpCompteur = MPCompteur;
+    compteurPlace = (unsigned int *) shmat(id_mpCompteur,NULL,0);
 }
 
 /**
  * T0D0 : rajouter le numero de la boite au lettre dans param de BE
  */
-void BarriereEntree(int numBal)
+void BarriereEntree(TypeBarriere barr, unsigned int semMP, unsigned int semSync, unsigned int semCompteur, unsigned int boiteAL, unsigned int MPReq, unsigned int MPPark, unsigned int MPCompteur)
 {
-	init(numBal);
+	init(TypeBarriere barr, unsigned int semMP, unsigned int semSync, unsigned int semCompteur, unsigned int boiteAL, unsigned int MPReq, unsigned int MPPark, unsigned int MPCompteur);
 	
 	for(;;)
 	{
@@ -137,12 +137,17 @@ void BarriereEntree(int numBal)
 		//Recuperation du message
 		while(msgrcv(id_bal, &newCar, TAILLE_MSG_VOITURE, 0, 0) == -1 && errno == EINTR);
 		
-		AfficherRequete(barriere, newCar.type, newCar.hEntree);
+		semop(id_sem, &semP,1 );
+		
+		semop(id_sem, &semV,1 );
+		
+		//AfficherRequete(barriere, newCar.type, newCar.hEntree);
 		
 		
 		semop(id_sem, &semP,1 );
 		voiturePresente = true;
 		semop(id_sem, &semV,1 );
+		
 		
 		// Demande de garage
 		semop(id_sem, &semP,1 );

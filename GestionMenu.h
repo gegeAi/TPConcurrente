@@ -31,7 +31,7 @@ void Commande( char code, unsigned int valeur);
 // Contrat :
 //
 
-void GestionMenu();
+void GestionMenu(unsigned int balAutres, unsigned int balProfs, unsigned int balGB, unsigned int balSortie);
 // Mode d'emploi :
 //
 // Contrat :

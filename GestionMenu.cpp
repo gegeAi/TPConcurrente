@@ -74,20 +74,13 @@ static void init()
 	masquage.sa_flags = 0;
 	sigaction (SIGUSR1, &masquage, NULL);
 	sigaction (SIGUSR2, &masquage, NULL);
+
+	//Recuperation des boites aux lettre
+	id_balAutres = balAutres;
+	id_balProfs balProfs;
+	id_balGB = balGB;
+	id_balSortie = balSortie;
 	
-	//récupération des boîtes aux lettres
-    key_t clefBALProfs = ftok(REFERENCE, 2);
-    id_balProfs = msgget(clefBALProfs, 0660);
-    
-    key_t clefBALAutres = ftok(REFERENCE, 3);
-    id_balAutres = msgget(clefBALAutres, 0660);
-    
-    key_t clefBALGB = ftok(REFERENCE, 4);
-    id_balGB = msgget(clefBALGB, 0660);
-    
-    key_t clefBALSortie = ftok(REFERENCE, 5);
-    id_balSortie = msgget(clefBALSortie, 0660);
-    
     nouveau.num = 0;
 
 }// fin de init
@@ -102,11 +95,11 @@ static void init()
 } //----- fin de Nom*/
 
 
-void GestionMenu()
+void GestionMenu(unsigned int balAutres, unsigned int balProfs, unsigned int balGB, unsigned int balSortie)
 // Algorithme :
 //
 {
-	init();
+	init(unsigned int balAutres, unsigned int balProfs, unsigned int balGB, unsigned int balSortie);
 	
 	for(;;)
 	{
@@ -122,8 +115,6 @@ void Commande( char code, unsigned int valeur)
 // Algorithme :
 //
 {
-	//Afficher(MESSAGE, code+"", NORMALE);
-	sleep(5);
 	switch(code)
 	{
 		case 'E' :
@@ -136,32 +127,18 @@ void Commande( char code, unsigned int valeur)
 			nouveau.hEntree = time(NULL);
 			nouveau.hSortie = 0;
 			nouveau.cout = 0;
-			nouveau.num = nouveau.num%1000;
+			nouveau.num = (nouveau.num+1)%1000;
 			
 			if(valeur == 1)
 			{									
-				//if(msgsnd(id_balProfs,&nouveau,TAILLE_MSG_VOITURE,0)==-1)
-				{
-					DessinerVoitureBarriere(PROF_BLAISE_PASCAL,PROF);
-					//Afficher(MESSAGE, "Voiture non creee", NORMALE);
-				}
-				//else
-				{
-					//Afficher(MESSAGE, "", NORMALE);
-				}
+				msgsnd(id_balProfs,&nouveau,TAILLE_MSG_VOITURE,0);
 			}
 			else
 			{
-				//if(msgsnd(id_balGB,&nouveau,TAILLE_MSG_VOITURE,0)==-1)
-				{
-					DessinerVoitureBarriere(ENTREE_GASTON_BERGER,PROF);
-					//Afficher(MESSAGE, "Voiture non creee", NORMALE);
-				}
-				//else
-				{
-					//Afficher(MESSAGE, "", NORMALE);
-				}
+				msgsnd(id_balGB,&nouveau,TAILLE_MSG_VOITURE,0);
+
 			}
+			break;
 		}
 		case 'A' :
 		{
@@ -170,46 +147,24 @@ void Commande( char code, unsigned int valeur)
 			nouveau.hEntree = time(NULL);
 			nouveau.hSortie = 0;
 			nouveau.cout = 0;
-			nouveau.num = nouveau.num%1000;
+			nouveau.num = (nouveau.num+1)%1000;
 			
 			if(valeur == 1)
 			{			
-				//if(msgsnd(id_balAutres,&nouveau,TAILLE_MSG_VOITURE,0)==-1)
-				{
-					
-					DessinerVoitureBarriere(AUTRE_BLAISE_PASCAL,AUTRE);
-					Afficher(MESSAGE, "Bizarre", NORMALE);
-				}
-				//else
-				{
+				msgsnd(id_balAutres,&nouveau,TAILLE_MSG_VOITURE,0);
 
-					//Afficher(MESSAGE, "", NORMALE);
-				}
 			}
 			else
 			{
 		
-				//if(msgsnd(id_balGB,&nouveau,TAILLE_MSG_VOITURE,0)==-1)
-				{
-					DessinerVoitureBarriere(ENTREE_GASTON_BERGER,AUTRE);
-					//Afficher(MESSAGE, "Voiture non creee", NORMALE);
-				}
-				//else
-				{
-					//Afficher(MESSAGE, "", NORMALE);
-				}
+				msgsnd(id_balGB,&nouveau,TAILLE_MSG_VOITURE,0);
 			}
+			break;
 		}
 		case 'S' :
 		{
-			if(msgsnd(id_balSortie,&valeur,TAILLE_MSG_VOITURE,0)==-1)
-			{
-				//Afficher(MESSAGE, "Sortie non prise en compte", NORMALE);
-			}
-			else
-			{
-				//Afficher(MESSAGE, "", NORMALE);
-			}
+			msgsnd(id_balSortie,&valeur,TAILLE_MSG_VOITURE,0);
+			break;
 		}
 	}
 }//----- fin de Commande
