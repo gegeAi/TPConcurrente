@@ -36,7 +36,7 @@ struct Requete
 typedef struct msgBaL msgBaL;
 struct msgBaL
 {
-	long type;
+	long mtype;
 	int place[1];
 };
 	

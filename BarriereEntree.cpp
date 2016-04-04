@@ -60,6 +60,7 @@ struct sembuf semV = {0, 1,0};
 
 static void ITFin(int noSig)
 {
+	//Detachement des memoires partagees
 	shmdt(voiturePresente);
 	shmdt(parking);
 	shmdt(compteurPlace);
@@ -102,6 +103,9 @@ static void init(TypeBarriere barr, unsigned int semMP, unsigned int semSync, un
 	action2.sa_flags = 0;
 	sigaction (SIGCHLD, &action2, NULL);*/
 	
+	//recuperation de la barriere
+	barriere = barr;
+	
 	switch(barriere) {
 			case PROF_BLAISE_PASCAL :
 				numMemoire = 0;
@@ -130,17 +134,16 @@ static void init(TypeBarriere barr, unsigned int semMP, unsigned int semSync, un
     
     //récup sémaphore de compteur
     id_semCompt = semCompteur;
-    
-    barriere = barr;
-    
-    
-    //récupération mémoires partagées
+   
+    //récupération mémoires partagées pour la requete
     id_mpReq = MPReq;
     voiturePresente = (Requete *) shmat(id_mpReq,NULL,0);
     
+    //récupération mémoires partagées pour le parking
     id_mpParking = MPPark;
     parking = (Voiture *) shmat(id_mpParking,NULL,0);
     
+    //récupération mémoires partagées pour le compteur
     id_mpCompteur = MPCompteur;
     compteurPlace = (unsigned int *) shmat(id_mpCompteur,NULL,0);
 }
@@ -158,6 +161,7 @@ void BarriereEntree(TypeBarriere barr, unsigned int semMP, unsigned int semSync,
 		Afficher(MESSAGE, "Attente");
 		while(msgrcv(id_bal, &newCar, sizeof(newCar.mVoiture), 1, 0) == -1);
 		
+		
 		while(semop(id_semCompt, &semP,1 )==-1);
 		Afficher(MESSAGE, *compteurPlace);
 		if((*compteurPlace)>0)
@@ -167,10 +171,11 @@ void BarriereEntree(TypeBarriere barr, unsigned int semMP, unsigned int semSync,
 			//Afficher(MESSAGE,*compteurPlace);
 			while(semop(id_semCompt, &semV,1 )==-1);
 			
+			//Creation voiturier
 			pid_t voiturier = GarerVoiture(barriere);
 			
 			int place;
-			waitpid(voiturier, &place, 0);
+			/*waitpid(voiturier, &place, 0);
 			place = WEXITSTATUS(place);
 			Afficher(MESSAGE, "lfsjrstjftjggsfj");
 			while(semop(id_semPark, &semP,1 )==-1);
@@ -178,7 +183,7 @@ void BarriereEntree(TypeBarriere barr, unsigned int semMP, unsigned int semSync,
 			parking[place-1] = newCar.mVoiture;
 			Afficher(MESSAGE, "pppppppppppppppppppppp");
 			while(semop(id_semPark, &semV,1 )==-1);
-			Afficher(MESSAGE, "lol mec c fou");
+			Afficher(MESSAGE, "lol mec c fou");*/
 		}
 		else
 		{
@@ -189,11 +194,6 @@ void BarriereEntree(TypeBarriere barr, unsigned int semMP, unsigned int semSync,
 			voiturePresente[numMemoire].type = newCar.mVoiture.type;
 			voiturePresente[numMemoire].hRequete = newCar.mVoiture.hEntree;
 			semop(id_semReq, &semV,1 );
-		
-			
-			// Demande de garage
-			semop(id_semSync, &semP,1 );
-
 			
 			// Attente de l'autorisation de garage
 			semop(id_semSync, &semP,1 );
@@ -205,18 +205,17 @@ void BarriereEntree(TypeBarriere barr, unsigned int semMP, unsigned int semSync,
 			pid_t voiturier = GarerVoiture(barriere);
 			int place;
 			waitpid(noFils, &place, 0);
+			place = WEXITSTATUS(place);
 			
 			semop(id_semPark, &semP,1 );
-			*(parking+(place-1)) = newCar.mVoiture;
+			parking[place-1] = newCar.mVoiture;
 			semop(id_semPark, &semV,1 );
 		}
 		
 		
 		//AfficherRequete(barriere, newCar.type, newCar.hEntree);
 		
-		
-		
-		
+
 	}
 }
 

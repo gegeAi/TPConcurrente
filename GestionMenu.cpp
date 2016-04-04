@@ -47,6 +47,7 @@ static int id_balAutres;
 static int id_balGB;
 static int id_balSortie;
 static messVoiture nouveau;
+static msgBaL voitureASortir;
 
 //------------------------------------------------------ Fonctions privées
 //static type nom ( liste de paramètres )
@@ -82,6 +83,7 @@ static void init(unsigned int balAutres, unsigned int balProfs, unsigned int bal
 	id_balGB = balGB;
 	id_balSortie = balSortie;
 	
+	//Initialisation du numero des voitures
     nouveau.mVoiture.num = 0;
 
 }// fin de init
@@ -125,18 +127,17 @@ void Commande( char code, unsigned int valeur)
 		}
 		case 'P' :
 		{
-			
+			//Mise en place des attributs de la voiture
 			nouveau.mVoiture.type = PROF;
 			nouveau.mVoiture.hEntree = time(NULL);
 			nouveau.mVoiture.hSortie = 0;
 			nouveau.mVoiture.num = (nouveau.mVoiture.num+1)%1000;
 			nouveau.mtype = 1;
 
-			
+			//Envoi du message à la boite au lettre correspondante
 			if(valeur == 1)
 			{									
 				msgsnd(id_balProfs,&nouveau,sizeof(nouveau.mVoiture),IPC_NOWAIT);
-				Afficher(MESSAGE, errno);
 			}
 			else
 			{
@@ -148,12 +149,14 @@ void Commande( char code, unsigned int valeur)
 		case 'A' :
 		{
 		
+			//Mise en place des attributs de la voiture
 			nouveau.mVoiture.type = AUTRE;
 			nouveau.mVoiture.hEntree = time(NULL);
 			nouveau.mVoiture.hSortie = 0;
 			nouveau.mVoiture.num = (nouveau.mVoiture.num+1)%1000;
 			nouveau.mtype = 1;
 			
+			//Envoi du message à la boite au lettre correspondante
 			if(valeur == 1)
 			{			
 				msgsnd(id_balAutres,&nouveau,TAILLE_MSG_VOITURE,IPC_NOWAIT);
@@ -168,7 +171,10 @@ void Commande( char code, unsigned int valeur)
 		}
 		case 'S' :
 		{
-			msgsnd(id_balSortie,&valeur,TAILLE_MSG_VOITURE,IPC_NOWAIT);
+			voitureASortir.place[0]=valeur;
+			voitureASortir.mtype=1;
+			Afficher(MESSAGE,msgsnd(id_balSortie,&voitureASortir,sizeof(int),IPC_NOWAIT));
+			
 			break;
 		}
 	}
