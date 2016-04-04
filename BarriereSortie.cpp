@@ -35,14 +35,17 @@ using namespace std;
 
 //----------------------------------------------------- Méthodes publiques
 
-static Voiture * parking;
-static Requete * requete[3];
-static int * compteur;
+static int pidFils[8] == {0,0,0,0,0,0,0,0};
 
-void run()
+void run(Voiture * parking, Requete * requete[], int idAutorisation[], int idSortieVoiture, int semParking, int semRequete[], int * cpt, int semCpt)
 {
+	
+
 	while(true)
 	{
+		msgBaL * lecture = (msgBaL *) malloc(sizeof(msgBaL));
+		msgrcv(idSortieVoiture, lecture, sizeof(int), 0, 0);
+		pidFils[lecture->place] = SortirVoiture(lecture->place);
 		
 	}
 }
@@ -50,6 +53,10 @@ void run()
 void BarriereSortie(int idParking, int idRequete[], int idAutorisation[], int idSortieVoiture, int semParking, int semRequete[], int idCpt, int semCpt)
 {
 	//init
+	Voiture * parking;
+	Requete * requete[3];
+	int * compteur;
+
 	parking = (Voiture*) shmat(idParking, NULL, 0);
 	compteur = (int *) shmat(idCpt, NULL, 0);
 

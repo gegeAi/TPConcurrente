@@ -20,5 +20,12 @@ struct Requete
 	char type;
 	int hRequete;
 };
+
+typedef struct msgBaL msgBaL
+struct msgBal
+{
+	long type;
+	int place[1];
+};
 	
 #endif

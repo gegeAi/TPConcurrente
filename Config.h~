@@ -14,13 +14,18 @@ struct Voiture
 };	
 static const int TAILLE_MSG_VOITURE = sizeof(Voiture);
 
-enum Porte { PROF, AUTRE, GB};
-
 typedef struct Requete Requete;
 struct Requete
 {
 	char type;
 	int hRequete;
+};
+
+typedef struct msgBaL msgBaL
+struct msgBal
+{
+	long type;
+	Voiture msg[1];
 };
 	
 #endif

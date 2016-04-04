@@ -68,24 +68,21 @@ int main()
 	int compteurVoiture;
 	int autorisation[3];
 	int semCpt;
-	int semRequete;
+	int semRequete[3];
 	int semParking;
 
 	parking = shmget(ftok(REFERENCE, 1), sizeof(Voiture)*8, IPC_CREAT | IPC_EXCL | DROITS);
-	arriveeVoiture[0] = msgget(ftok(REFERENCE, 2), IPC_CREAT | IPC_EXCL | DROITS);
-	arriveeVoiture[1] = msgget(ftok(REFERENCE, 3), IPC_CREAT | IPC_EXCL | DROITS);
-	arriveeVoiture[2] = msgget(ftok(REFERENCE, 4), IPC_CREAT | IPC_EXCL | DROITS);
-	sortieVoiture = msgget(ftok(REFERENCE, 5), IPC_CREAT | IPC_EXCL | DROITS);
-	requete[0] = shmget(ftok(REFERENCE, 6), sizeof(Requete), IPC_CREAT | IPC_EXCL | DROITS);
-	requete[1] = shmget(ftok(REFERENCE, 7), sizeof(Requete), IPC_CREAT | IPC_EXCL | DROITS);
-	requete[2] = shmget(ftok(REFERENCE, 8), sizeof(Requete), IPC_CREAT | IPC_EXCL | DROITS);
-	compteurVoiture = shmget(ftok(REFERENCE, 9), sizeof(int), IPC_CREAT | IPC_EXCL | DROITS);
-	autorisation[0] = semget(ftok(REFERENCE, 10), 1, IPC_CREAT | IPC_EXCL | DROITS);
-	autorisation[1] = semget(ftok(REFERENCE, 11), 1, IPC_CREAT | IPC_EXCL | DROITS);
-	autorisation[2] = semget(ftok(REFERENCE, 12), 1, IPC_CREAT | IPC_EXCL | DROITS);
-	semCpt = semget(ftok(REFERENCE, 13), 1, IPC_CREAT | IPC_EXCL | DROITS);
-	semRequete = semget(ftok(REFERENCE, 14), 1, IPC_CREAT | IPC_EXCL | DROITS);
-	semParking = semget(ftok(REFERENCE, 15), 1, IPC_CREAT | IPC_EXCL | DROITS);
+	sortieVoiture = msgget(ftok(REFERENCE, 2), IPC_CREAT | IPC_EXCL | DROITS);
+	compteurVoiture = shmget(ftok(REFERENCE, 3), sizeof(int), IPC_CREAT | IPC_EXCL | DROITS);
+	semCpt = semget(ftok(REFERENCE, 4), 1, IPC_CREAT | IPC_EXCL | DROITS);
+	semParking = semget(ftok(REFERENCE, 5), 1, IPC_CREAT | IPC_EXCL | DROITS);
+	for(int i=0; i<3; i++)
+	{
+		arriveeVoiture[i] = msgget(ftok(REFERENCE, 6+i), IPC_CREAT | IPC_EXCL | DROITS);
+		requete[i] = shmget(ftok(REFERENCE, 9+i), sizeof(Requete), IPC_CREAT | IPC_EXCL | DROITS);
+		autorisation[i] = semget(ftok(REFERENCE, 12+i), 1, IPC_CREAT | IPC_EXCL | DROITS);
+		semRequete[i] = semget(ftok(REFERENCE, 15+i), 1, IPC_CREAT | IPC_EXCL | DROITS);
+	}
 
 	//creation taches
 
@@ -97,21 +94,21 @@ int main()
 	{
 		if((barrieresEntree[0] = fork()) == 0)
 		{
-			//BarriereEntree(PROF_BLAISE_PASCAL, unsigned int semMP, autorisation[0], semCpt, arriveeVoiture[0], requete[0], parking, compteur)
+			//BarriereEntree(PROF_BLAISE_PASCAL, semRequete[0], autorisation[0], semCpt, semParking, arriveeVoiture[0], requete[0], parking, compteur);
 			exit(0);
 		}
 		else
 		{
 			if((barrieresEntree[1] = fork()) == 0)
 			{
-				//BarriereEntree(AUTRE_BLAISE_PASCAL, unsigned int semMP, autorisation[1], semCpt, arriveeVoiture[1], requete[1], parking, compteur)
+				//BarriereEntree(AUTRE_BLAISE_PASCAL, semRequete[1], autorisation[1], semCpt, semParking, arriveeVoiture[1], requete[1], parking, compteur);
 				exit(0);
 			}
 			else
 			{
 				if((barrieresEntree[2] = fork()) == 0)
 				{
-					//BarriereEntree(ENTREE_GASTON_BERGER, unsigned int semMP, autorisation[2], semCpt, arriveeVoiture[2], requete[2], parking, compteur)
+					//BarriereEntree(ENTREE_GASTON_BERGER, semRequete[2], autorisation[2], semCpt, semParking, arriveeVoiture[2], requete[2], parking, compteur);
 					exit(0);
 				}
 				else
@@ -143,20 +140,18 @@ int main()
 
 	//destruction ipcs
 	shmctl(parking, IPC_RMID, NULL);
-	msgctl(arriveeVoiture[0], IPC_RMID, NULL);
-	msgctl(arriveeVoiture[1], IPC_RMID, NULL);
-	msgctl(arriveeVoiture[2], IPC_RMID, NULL);
 	msgctl(sortieVoiture, IPC_RMID, NULL);
-	shmctl(requete[0], IPC_RMID, NULL);
-	shmctl(requete[1], IPC_RMID, NULL);
-	shmctl(requete[2], IPC_RMID, NULL);
 	shmctl(compteurVoiture, IPC_RMID, NULL);
-	semctl(autorisation[0], 0, IPC_RMID);
-	semctl(autorisation[1], 0, IPC_RMID);
-	semctl(autorisation[2], 0, IPC_RMID);
 	semctl(semCpt, 0, IPC_RMID);
-	semctl(semRequete, 0, IPC_RMID);
 	semctl(semParking, 0, IPC_RMID);
+
+	for(int i=0; i<3; i++)
+	{
+		msgctl(arriveeVoiture[i], IPC_RMID, NULL);
+		shmctl(requete[i], IPC_RMID, NULL);
+		semctl(semRequete[i], 0, IPC_RMID);
+		semctl(autorisation[i], 0, IPC_RMID);
+	}
 
 	TerminerApplication(true);
 	
