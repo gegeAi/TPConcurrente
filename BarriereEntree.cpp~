@@ -233,22 +233,22 @@ void BarriereEntree(TypeBarriere barr, unsigned int semMP, unsigned int semSync,
 			DessinerVoitureBarriere(barriere, newCar.mVoiture.type);
 			
 			//Depot de la requête
-			while(semop(id_semReq, &semP,1 ) == -1);
+			semop(id_semReq, &semP,1 );
 			voiturePresente[numMemoire].type = newCar.mVoiture.type;
 			voiturePresente[numMemoire].hRequete = time(NULL);
 			voiturePresente[numMemoire].used = 0;
-			while(semop(id_semReq, &semV,1 ) == -1);
+			semop(id_semReq, &semV,1 );
 			
 			// Attente de l'autorisation de garage
-			while(semop(id_semSync, &semP,1 ) == -1);
+			semop(id_semSync, &semP,1 );
 			
 			
 		}
 		
 		//Mise à jour du nombre de place libre dans le Parking
-		while(semop(id_semCompt, &semP,1 ) == -1);
+		semop(id_semCompt, &semP,1 );
 		(*compteurPlace)--;
-		while(semop(id_semCompt, &semV,1 ) == -1);
+		semop(id_semCompt, &semV,1 );
 		
 		//Creation voiturier
 		pid_t voiturier = GarerVoiture(barriere);

@@ -107,7 +107,7 @@ void run(int idSortieVoiture)
 	while(true)
 	{
 		msgBaL * lecture = new msgBaL();
-		msgrcv(idSortieVoiture, lecture, sizeof(int), 1, 0);
+		while(msgrcv(idSortieVoiture, lecture, sizeof(int), 1, 0) == -1);
 		pid_voiturier[lecture->place[0]-1] = SortirVoiture(lecture->place[0]);
 		delete lecture;	
 	}
@@ -163,58 +163,49 @@ void finNormale(int noSignal)
 
 void checkAutorisations()
 {
-	if((*compteur) < 3)
-	{
 		int nChoisi = -1;
 		while(semop(semReq[0], &reserver, 1)==-1);
 		while(semop(semReq[1], &reserver, 1)==-1);
 		while(semop(semReq[2], &reserver, 1)==-1);
-		for(int j=0; j<(*compteur); j++)
+		for(int i=0; i<3; i++)
 		{
-			for(int i=0; i<3; i++)
+			if(nChoisi == -1 && requete[i]->used == 0)
 			{
-				if(nChoisi == -1 && requete[i] != NULL)
+				nChoisi = i;
+			}
+			else if(nChoisi != -1 && requete[i]->used == 0)
+			{
+				if(requete[nChoisi]->type < requete[i]->type)
 				{
-					nChoisi = i;
+					nChoisi=i;
 				}
-				else if(nChoisi != -1 && requete[i] != NULL)
+				else if(requete[nChoisi]->type == requete[i]->type)
 				{
-					if(requete[i]->type==PROF)
+					if(requete[nChoisi]->hRequete > requete[i]->hRequete)
 					{
-						if(requete[nChoisi]->type!=PROF || (requete[nChoisi]->type==PROF && requete[i]->hRequete < requete[nChoisi]->hRequete))
-						{
-							nChoisi = i;
-						}
-					}
-					else
-					{
-						if(requete[nChoisi]->type==AUTRE && requete[i]->hRequete < requete[nChoisi]->hRequete)
-						{
-							nChoisi = i;
-						}
+						nChoisi=i;
 					}
 				}
 			}
-			requete[nChoisi]=NULL;
-			switch(nChoisi)
-			{
-				case 0:
-					Efface(REQUETE_R1);
-					break;
-				case 1:
-					Efface(REQUETE_R2);
-					break;
-				case 2:
-					Efface(REQUETE_R3);
-					break;
-			}
-			while(semop(idAuto[nChoisi], &liberer, 1)==-1);
-			
 		}
+		requete[nChoisi]->used = 1;
+		switch(nChoisi)
+		{
+			case 0:
+				Effacer(REQUETE_R1);
+				break;
+			case 1:
+				Effacer(REQUETE_R2);
+				break;
+			case 2:
+				Effacer(REQUETE_R3);
+				break;
+		}
+		while(semop(idAuto[nChoisi], &liberer, 1)==-1);
+			
 		while(semop(semReq[0], &liberer, 1)==-1);
 		while(semop(semReq[1], &liberer, 1)==-1);
 		while(semop(semReq[2], &liberer, 1)==-1);
-	}
 }
 
 void init(int idParking, int idCpt, int semCpt, int semParking, int idRequete[], int semRequete[], int idAutorisation[])

@@ -1,0 +1,25 @@
+#!/bin/sh
+
+key=294000
+
+while test $key -le 558000
+	do
+	ipcrm -s $key
+	key=$(($key+1))
+done
+
+key2=1620000
+
+while test $key2 -le 1770000
+	do
+	ipcrm -m $key2
+	key2=$(($key2+1))
+done
+
+key3=130000
+
+while test $key3 -le 197000
+	do
+	ipcrm -q $key3
+	key3=$(($key3+1))
+done

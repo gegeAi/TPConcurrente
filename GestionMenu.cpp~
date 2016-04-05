@@ -157,7 +157,7 @@ void Commande( char code, unsigned int valeur)
 			voitureASortir.mtype=1;
 			
 			//Envoi du message à la boite au lettre de sortie
-			msgsnd(id_balSortie,&voitureASortir,sizeof(int),IPC_NOWAIT);
+			Afficher(MESSAGE,msgsnd(id_balSortie,&voitureASortir,sizeof(int),IPC_NOWAIT));
 			
 			break;
 		}

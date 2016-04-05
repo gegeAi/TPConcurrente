@@ -2,8 +2,12 @@
 #define CONFIG_H
 
 #include "Outils.h"
-static const char * REFERENCE = "./keyB3130"; 
+
+#include <time.h>
+
+static const char * REFERENCE = "./Mere.cpp"; 
 static const int DROITS = 0660;
+static const int TEMPO = 1;
 
 typedef struct Voiture Voiture;
 struct Voiture
@@ -11,7 +15,15 @@ struct Voiture
 	TypeUsager type;
 	int num;
 	int hEntree, hSortie;
+	
 };	
+
+typedef struct
+{
+	long mtype;
+	Voiture mVoiture;
+	
+} messVoiture;
 
 static const int TAILLE_MSG_VOITURE = sizeof(Voiture);
 
@@ -19,13 +31,13 @@ typedef struct Requete Requete;
 struct Requete
 {
 	TypeUsager type;
-	int hRequete;
+	time_t hRequete;
 };
 
 typedef struct msgBaL msgBaL;
-struct msgBal
+struct msgBaL
 {
-	long type;
+	long mtype;
 	int place[1];
 };
 	

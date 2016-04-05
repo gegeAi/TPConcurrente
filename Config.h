@@ -31,7 +31,8 @@ typedef struct Requete Requete;
 struct Requete
 {
 	TypeUsager type;
-	int hRequete;
+	time_t hRequete;
+	short used;
 };
 
 typedef struct msgBaL msgBaL;

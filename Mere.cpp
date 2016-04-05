@@ -79,6 +79,7 @@ int main()
 	semParking = semget(ftok(REFERENCE, 5), 1, IPC_CREAT | DROITS);
 	semctl(semCpt, 0, SETVAL, 1);
 	semctl(semParking, 0, SETVAL, 1);
+	
 	for(int i=0; i<3; i++)
 	{
 		arriveeVoiture[i] = msgget(ftok(REFERENCE, 6+i), IPC_CREAT | DROITS);
@@ -87,7 +88,12 @@ int main()
 		semRequete[i] = semget(ftok(REFERENCE, 15+i), 1, IPC_CREAT | DROITS);
 		semctl(autorisation[i], 0, SETVAL, 0);
 		semctl(semRequete[i], 0, SETVAL, 1);
+		Requete * req = (Requete*) shmat(requete[i], NULL, 0);
+		req->used=1;
+		shmdt(req);
+		
 	}
+	
 	
 	Voiture * leParking = (Voiture *) shmat(parking,NULL,0);
 	leParking = new Voiture[8];
