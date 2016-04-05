@@ -204,13 +204,13 @@ void BarriereEntree(TypeBarriere barr, unsigned int semMP, unsigned int semSync,
 		
 		//Récupération du nombre de place restante
 		while(semop(id_semCompt, &semP,1 )==-1);
-		placeParking = (*compteurPlace);
-		while(semop(id_semCompt, &semV,1 )==-1);	
-		
-		if(placeParking>0)
-		{}
+		if((*compteurPlace)>0)
+		{
+			while(semop(id_semCompt, &semV,1 )==-1);
+		}
 		else
 		{	
+			while(semop(id_semCompt, &semV,1 )==-1);
 			//Affichage de la requête		
 			AfficherRequete(barriere, newCar.mVoiture.type, time(NULL));
 			
