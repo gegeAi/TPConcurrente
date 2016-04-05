@@ -69,7 +69,7 @@ static void init(unsigned int balAutres, unsigned int balProfs, unsigned int bal
 // Algorithme :
 //
 {
-	//masquage des signaux de l'appli
+	//Masque les signaux SIGUSR1 et SIGUSR2
 	struct sigaction masquage;
 	masquage.sa_handler = SIG_IGN;
 	sigemptyset (&masquage.sa_mask);
@@ -102,13 +102,14 @@ void GestionMenu(unsigned int balAutres, unsigned int balProfs, unsigned int bal
 // Algorithme :
 //
 {
+	//Lancement de la phase d'initialisation de la tâche
 	init(balAutres, balProfs, balGB, balSortie);
 	
+	//Lancement de la phase moteur de la tâche
 	for(;;)
 	{
 		Menu();
 	}
-	exit(0);
 	
 }//----- fin de GestionMenu
 
@@ -120,6 +121,7 @@ void Commande( char code, unsigned int valeur)
 {
 	switch(code)
 	{
+		//quitte l'application
 		case 'E' :
 		{
 			
@@ -129,8 +131,6 @@ void Commande( char code, unsigned int valeur)
 		{
 			//Mise en place des attributs de la voiture
 			nouveau.mVoiture.type = PROF;
-			/*nouveau.mVoiture.hEntree = time(NULL);
-			nouveau.mVoiture.hSortie = 0;*/
 			nouveau.mVoiture.num = (nouveau.mVoiture.num+1)%1000;
 			nouveau.mtype = 1;
 
@@ -151,8 +151,6 @@ void Commande( char code, unsigned int valeur)
 		
 			//Mise en place des attributs de la voiture
 			nouveau.mVoiture.type = AUTRE;
-			/*nouveau.mVoiture.hEntree = time(NULL);
-			nouveau.mVoiture.hSortie = 0;*/
 			nouveau.mVoiture.num = (nouveau.mVoiture.num+1)%1000;
 			nouveau.mtype = 1;
 			
@@ -171,8 +169,11 @@ void Commande( char code, unsigned int valeur)
 		}
 		case 'S' :
 		{
+			//Mise à jour des paramètres du message
 			voitureASortir.place[0]=valeur;
 			voitureASortir.mtype=1;
+			
+			//Envoi du message à la boite au lettre de sortie
 			Afficher(MESSAGE,msgsnd(id_balSortie,&voitureASortir,sizeof(int),IPC_NOWAIT));
 			
 			break;

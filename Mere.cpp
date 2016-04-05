@@ -85,7 +85,7 @@ int main()
 		requete[i] = shmget(ftok(REFERENCE, 9+i), sizeof(Requete), IPC_CREAT | DROITS);
 		autorisation[i] = semget(ftok(REFERENCE, 12+i), 1, IPC_CREAT | DROITS);
 		semRequete[i] = semget(ftok(REFERENCE, 15+i), 1, IPC_CREAT | DROITS);
-		semctl(autorisation[i], 0, SETVAL, 1);
+		semctl(autorisation[i], 0, SETVAL, 0);
 		semctl(semRequete[i], 0, SETVAL, 1);
 	}
 	

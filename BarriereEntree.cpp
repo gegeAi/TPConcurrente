@@ -48,6 +48,7 @@ static Requete * voiturePresente;
 static unsigned int * compteurPlace;
 static pid_t noFils;
 static VoitureEnMouvement * mouvement;
+
 //operation p
 struct sembuf semP = {0, -1,0};
 //operation v
@@ -81,25 +82,27 @@ static void ITFin(int noSig)
 
 static void ITFinFils(int noSig)
 {
-	//Recherche des infos de la voitures qui vient de se garer
+	
 	int position,place,id;
+	
+	//Recuperation du pid du Voiturier
 	id = waitpid(0, &place, 0);
 	place = WEXITSTATUS(place);
 	
-
+	//Recherche des infos de la voitures qui vient de se garer
 	for(int i=0;i<NB_PLACES;i++)
 	{
-		Afficher(MESSAGE, "Osdijglskdjgsldkjg zejgsdlkgsldkgj jskldgj");
 		if(mouvement[i].id == id)
 		{
+			//Mise à jour du champ
 			AfficherPlace(place, mouvement[i].infoVoiture.type, mouvement[i].infoVoiture.num, mouvement[i].infoVoiture.hEntree);
-			Afficher(MESSAGE, "Mon gars on va prendre le sem");
-			Afficher(MESSAGE, place);
+			
+			//Ecriture de la voiture dans la memoire partagée Parking
 			while(semop(id_semPark, &semP,1 )==-1);
 			parking[place-1] = mouvement[i].infoVoiture;
 			while(semop(id_semPark, &semV,1 )==-1);
-			mouvement[i].id = 0;
-			Afficher(MESSAGE, "lol mec c fou");
+			
+			mouvement[i].id = 0;		
 			break;
 		}
 	}
@@ -107,7 +110,7 @@ static void ITFinFils(int noSig)
 
 static void init(TypeBarriere barr, unsigned int semMP, unsigned int semSync, unsigned int semCompteur, unsigned int semPark,  unsigned int boiteAL, unsigned int MPReq, unsigned int MPPark, unsigned int MPCompteur)
 {
-	//masquage de SIGUSR1 et SIGUSR2
+	//masque les signaux SIGUSR1 et SIGUSR2
 	struct sigaction masquage;
 	masquage.sa_handler = SIG_IGN;
 	sigemptyset (&masquage.sa_mask);
@@ -190,52 +193,22 @@ void BarriereEntree(TypeBarriere barr, unsigned int semMP, unsigned int semSync,
 	for(;;)
 	{
 		//Recuperation du message
-		Afficher(MESSAGE, "Attente");
-		Afficher(MESSAGE, (*compteurPlace));
-		
-		
 		while(msgrcv(id_bal, &newCar, sizeof(newCar.mVoiture), 1, 0) == -1);
-		newCar.mVoiture.hEntree = time(NULL);
 		
 		while(semop(id_semCompt, &semP,1 )==-1);
 		Afficher(MESSAGE, *compteurPlace);
-		//if((*compteurPlace)>0)
+		if((*compteurPlace)>0)
 		{
-			
+			//Mise à jour du nombre de place libre dans le Parking
 			(*compteurPlace)--;
-			//Afficher(MESSAGE,*compteurPlace);
-			while(semop(id_semCompt, &semV,1 )==-1);
+			while(semop(id_semCompt, &semV,1 )==-1);	
 			
-			//Creation voiturier
-			pid_t voiturier = GarerVoiture(barriere);
-			for(int i=0;i<NB_PLACES;i++)
-			{
-				if(mouvement[i].id==0)
-				{
-					mouvement[i].id=voiturier;
-					mouvement[i].infoVoiture=newCar.mVoiture;
-					break;
-				}
-			}
-			
-			/*int place;
-			waitpid(voiturier, &place, 0);
-			place = WEXITSTATUS(place);
-			Afficher(MESSAGE, "lfsjrstjftjggsfj");
-			while(semop(id_semPark, &semP,1 )==-1);
-			Afficher(MESSAGE, place);
-			parking[place-1] = newCar.mVoiture;
-			Afficher(MESSAGE, "pppppppppppppppppppppp");
-			while(semop(id_semPark, &semV,1 )==-1);
-			Afficher(MESSAGE, "lol mec c fou");*/
 		}
-		/*else
+		else
 		{
-			semop(id_semCompt, &semV,1 );
-			Afficher(MESSAGE, "pppppppppppppppppppppp");
-			sleep(3);
-			
-			AfficherRequete(barriere, newCar.mVoiture.type, newCar.mVoiture.hEntree);
+			while(semop(id_semCompt, &semV,1 )==-1);	
+						
+			AfficherRequete(barriere, newCar.mVoiture.type, time(NULL));
 			//Depot de la requête
 			semop(id_semReq, &semP,1 );
 			voiturePresente[numMemoire].type = newCar.mVoiture.type;
@@ -248,16 +221,22 @@ void BarriereEntree(TypeBarriere barr, unsigned int semMP, unsigned int semSync,
 			semop(id_semCompt, &semP,1 );
 			(*compteurPlace)--;
 			semop(id_semCompt, &semV,1 );
-			
-			pid_t voiturier = GarerVoiture(barriere);
-			int place;
-			waitpid(noFils, &place, 0);
-			place = WEXITSTATUS(place);
-			
-			semop(id_semPark, &semP,1 );
-			parking[place-1] = newCar.mVoiture;
-			semop(id_semPark, &semV,1 );
-		}*/
+		}
+		
+		//Creation voiturier
+		pid_t voiturier = GarerVoiture(barriere);
+		
+		newCar.mVoiture.hEntree = time(NULL);
+		
+		for(int i=0;i<NB_PLACES;i++)
+		{
+			if(mouvement[i].id==0)
+			{
+				mouvement[i].id=voiturier;
+				mouvement[i].infoVoiture=newCar.mVoiture;
+				break;
+			}
+		}
 		
 		sleep(TEMPO);
 		//AfficherRequete(barriere, newCar.type, newCar.hEntree);
