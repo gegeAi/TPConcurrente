@@ -47,7 +47,7 @@ static int semCompteur;
 static int semPark;
 static int semReq[3];
 static int idAuto[3];
-static int currentSortie;
+static int currentSortie=0;
 
 void checkAutorisations()
 {
@@ -87,24 +87,35 @@ void checkAutorisations()
 	}
 }
 
+void finNormale(int noPlace)
+{
+	Voiture v = parking[noPlace];
+	AfficherSortie(v.type, v.num, v.hEntree, v.hSortie);
+	while(semop(semCompteur, &reserver, 1)==-1);
+	(*compteur)++;
+	while(semop(semCompteur, &liberer, 1)==-1);
+	checkAutorisations();
+	
+}
+
 void run(int idSortieVoiture)
 {
 	while(true)
 	{
 		msgBaL * lecture = new msgBaL();
-		msgrcv(idSortieVoiture, lecture, sizeof(int), 0, 0);
+		msgrcv(idSortieVoiture, lecture, sizeof(int), 1, 0);
 		currentSortie = SortirVoiture(lecture->place[0]);
-		int place;	
-		waitpid(currentSortie, &place, 0);
-		finNormale(noPlace);
-		currentSortie=NULL;
+		int place=lecture->place[0];	
+		//waitpid(currentSortie, &place, 0);
+		finNormale(place);
+		currentSortie=0;
 		delete lecture;	
 	}
 }
 
 void end(int noSignal)
 {
-	if(currentSortie != NULL)
+	if(currentSortie != 0)
 	{
 		kill(currentSortie, SIGUSR2);
 		waitpid(currentSortie, NULL, 0);
@@ -121,17 +132,7 @@ void end(int noSignal)
 	exit(0);
 }
 
-void finNormale(int noPlace)
-{
-	Voiture v = parking[noPlace-1];
-	AfficherSortie(v.type, v.num, v.hEntree, v.hSortie);
-	while(semop(semCompteur, &reserver, 1)==-1);
-	(*compteur)++;
-	while(semop(semCompteur, &liberer, 1)==-1);
-	pidFils[noPlace-1]=0;
-	checkAutorisations();
-	
-}
+
 
 void BarriereSortie(int idParking, int idRequete[], int idAutorisation[], int idSortieVoiture, int semParking, int semRequete[], int idCpt, int semCpt)
 {
@@ -149,12 +150,12 @@ void BarriereSortie(int idParking, int idRequete[], int idAutorisation[], int id
 	termine.sa_flags=0;
 	sigaction(SIGUSR2, &termine, NULL);
 
-	//handler fin normale
+	/*//handler fin normale
 	struct sigaction finSortie;
 	finSortie.sa_handler = finNormale;
 	sigemptyset(&finSortie.sa_mask);
 	finSortie.sa_flags=0;
-	sigaction(SIGCHLD, &finSortie, NULL);
+	sigaction(SIGCHLD, &finSortie, NULL);*/
 
 	for(int i=0; i<3; i++)
 	{
