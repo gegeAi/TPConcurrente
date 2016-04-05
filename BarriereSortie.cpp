@@ -126,7 +126,6 @@ void finNormale(int noSignal)
 	while(semop(semCompteur, &reserver, 1)==-1);
 	(*compteur)++;
 	while(semop(semCompteur, &liberer, 1)==-1);
-
 	switch(place-1)
 	{
 		case 0:
@@ -158,11 +157,14 @@ void finNormale(int noSignal)
 	pid_voiturier[place-1]=0;
 	checkAutorisations();
 	
+	
 }
 
 
 void checkAutorisations()
 {
+	if(*compteur==1)
+	{
 		int nChoisi = -1;
 		while(semop(semReq[0], &reserver, 1)==-1);
 		while(semop(semReq[1], &reserver, 1)==-1);
@@ -173,9 +175,9 @@ void checkAutorisations()
 			{
 				nChoisi = i;
 			}
-			else if(nChoisi != -1 && requete[i]->used == 0)
+			else if(requete[i]->used == 0)
 			{
-				if(requete[nChoisi]->type < requete[i]->type)
+				if(requete[nChoisi]->type > requete[i]->type)
 				{
 					nChoisi=i;
 				}
@@ -206,6 +208,7 @@ void checkAutorisations()
 		while(semop(semReq[0], &liberer, 1)==-1);
 		while(semop(semReq[1], &liberer, 1)==-1);
 		while(semop(semReq[2], &liberer, 1)==-1);
+	}
 }
 
 void init(int idParking, int idCpt, int semCpt, int semParking, int idRequete[], int semRequete[], int idAutorisation[])

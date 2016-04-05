@@ -124,7 +124,7 @@ void Commande( char code, unsigned int valeur)
 			}
 			else
 			{
-				msgsnd(id_balGB,&nouveau,TAILLE_MSG_VOITURE,IPC_NOWAIT);
+				msgsnd(id_balGB,&nouveau,sizeof(nouveau.mVoiture),IPC_NOWAIT);
 
 			}
 			break;
@@ -140,13 +140,13 @@ void Commande( char code, unsigned int valeur)
 			//Envoi du message à la boite au lettre correspondante
 			if(valeur == 1)
 			{			
-				msgsnd(id_balAutres,&nouveau,TAILLE_MSG_VOITURE,IPC_NOWAIT);
+				msgsnd(id_balAutres,&nouveau,sizeof(nouveau.mVoiture),IPC_NOWAIT);
 
 			}
 			else
 			{
 		
-				msgsnd(id_balGB,&nouveau,TAILLE_MSG_VOITURE,IPC_NOWAIT);
+				msgsnd(id_balGB,&nouveau,sizeof(nouveau.mVoiture),IPC_NOWAIT);
 			}
 			break;
 		}

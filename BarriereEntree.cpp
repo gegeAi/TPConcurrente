@@ -35,7 +35,6 @@ static int id_semPark;
 static int id_mpReq;
 static int id_mpParking;
 static int id_mpCompteur;
-static int numMemoire;
 static TypeBarriere barriere;
 static messVoiture newCar ;
 static Voiture * parking;
@@ -112,6 +111,7 @@ static void ITFinFils(int noSig)
 			break;
 		}
 	}
+	//Afficher(MESSAGE, "garer");
 }//----- fin de ItFinFils
 
 static void init(TypeBarriere barr, unsigned int semMP, unsigned int semSync, unsigned int semCompteur, unsigned int semPark,  
@@ -146,21 +146,7 @@ static void init(TypeBarriere barr, unsigned int semMP, unsigned int semSync, un
 	sigaction (SIGCHLD, &action2, NULL);
 	
 	//recuperation de la barriere
-	barriere = barr;
-	
-	switch(barriere) {
-		case PROF_BLAISE_PASCAL :
-			numMemoire = 0;
-			break;
-			
-		case AUTRE_BLAISE_PASCAL :
-			numMemoire = 1;
-			break;
-		
-		case ENTREE_GASTON_BERGER :
-			numMemoire = 2;
-			break;
-	}
+	barriere = barr;	
 	
 	//récupération de la boîte aux lettres
     id_bal = boiteAL;
@@ -220,7 +206,6 @@ void BarriereEntree(TypeBarriere barr, unsigned int semMP, unsigned int semSync,
 		while(semop(id_semCompt, &semP,1 )==-1);
 		placeParking = (*compteurPlace);
 		while(semop(id_semCompt, &semV,1 )==-1);	
-		Afficher(MESSAGE, *compteurPlace);
 		
 		if(placeParking>0)
 		{}
@@ -234,9 +219,9 @@ void BarriereEntree(TypeBarriere barr, unsigned int semMP, unsigned int semSync,
 			
 			//Depot de la requête
 			while(semop(id_semReq, &semP,1 ) == -1);
-			voiturePresente[numMemoire].type = newCar.mVoiture.type;
-			voiturePresente[numMemoire].hRequete = time(NULL);
-			voiturePresente[numMemoire].used = 0;
+			voiturePresente->type = newCar.mVoiture.type;
+			voiturePresente->hRequete = time(NULL);
+			voiturePresente->used = 0;
 			while(semop(id_semReq, &semV,1 ) == -1);
 			
 			// Attente de l'autorisation de garage
@@ -248,6 +233,10 @@ void BarriereEntree(TypeBarriere barr, unsigned int semMP, unsigned int semSync,
 		//Mise à jour du nombre de place libre dans le Parking
 		while(semop(id_semCompt, &semP,1 ) == -1);
 		(*compteurPlace)--;
+		if(*compteurPlace < 0)
+		{
+			*compteurPlace=0;
+		}
 		while(semop(id_semCompt, &semV,1 ) == -1);
 		
 		//Creation voiturier
