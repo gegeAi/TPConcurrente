@@ -1,11 +1,11 @@
 /*************************************************************************
-                           GestionMenu  -  description
+                           GestionMenu  -  Tache GestionMenu
                              -------------------
-    début                : ${date}
-    copyright            : (C) ${year} par ${user}
+    début                : 16/03/16
+    copyright            : (C) GestionMenu par stoko
 *************************************************************************/
 
-//---------- Réalisation de la tache GestionMenu (fichier ${file_name}) --
+//---------- Réalisation de la tache GestionMenu (fichier GestionMenu.cpp) --
 
 //---------------------------------------------------------------- INCLUDE
 
@@ -50,19 +50,9 @@ static messVoiture nouveau;
 static msgBaL voitureASortir;
 
 //------------------------------------------------------ Fonctions privées
-//static type nom ( liste de paramètres )
-// Mode d'emploi :
-//
-// Contrat :
-//
-// Algorithme :
-//
-//{
-//} //----- fin de nom
-
 
 static void init(unsigned int balAutres, unsigned int balProfs, unsigned int balGB, unsigned int balSortie)
-// Mode d'emploi :
+// Mode d'emploi : initialise la tache GestionMenu
 //
 // Contrat :
 //
@@ -90,13 +80,6 @@ static void init(unsigned int balAutres, unsigned int balProfs, unsigned int bal
 
 //////////////////////////////////////////////////////////////////  PUBLIC
 //---------------------------------------------------- Fonctions publiques
-
-/*type Nom ( liste de paramètres )
-// Algorithme :
-//
-{
-} //----- fin de Nom*/
-
 
 void GestionMenu(unsigned int balAutres, unsigned int balProfs, unsigned int balGB, unsigned int balSortie)
 // Algorithme :

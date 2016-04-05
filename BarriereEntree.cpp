@@ -1,5 +1,5 @@
 /*************************************************************************
-                           BarriereEntree  -  description
+                           BarriereEntree  -  Tache BarriereEntree
                              -------------------
     début                : 11/03/16
     copyright            : (C) 2016 par Toko Samuel
@@ -20,16 +20,11 @@ using namespace std;
 #include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/wait.h>
-#include <errno.h>
 #include <sys/sem.h>
 #include <sys/shm.h>
 //------------------------------------------------------ Include personnel
 #include "BarriereEntree.h"
-
 #include "Outils.h"
-
-
-//------------------------------------------------------------- Constantes
 
 //---------------------------------------------------- Variables de classe
 static int id_bal;
@@ -53,15 +48,17 @@ static VoitureEnMouvement * mouvement;
 struct sembuf semP = {0, -1,0};
 //operation v
 struct sembuf semV = {0, 1,0};
-//----------------------------------------------------------- Types privés
 
-
-//----------------------------------------------------------------- PUBLIC
-//-------------------------------------------------------- Fonctions amies
-
-//----------------------------------------------------- Méthodes publiques
+//------------------------------------------------------ Fonctions privées
 
 static void ITFin(int noSig)
+// Mode d'emploi : Détache les mémoires partagées, tue les voituriers en activité
+//				   et termine la tache BarriereEntree
+//
+// Contrat : Mise du handler sur SIGUSR2
+//
+// Algorithme :
+//
 {
 	//Envoi de SIGUSR2 aux Voituriers
 	for(int i=0;i<NB_PLACES;i++)
@@ -78,9 +75,17 @@ static void ITFin(int noSig)
 	shmdt(compteurPlace);
 	
 	exit(0);
-}
+}//----- fin de ItFin
 
 static void ITFinFils(int noSig)
+// Mode d'emploi : Ajoute la voiture qui vient de se garer dans la memoire
+//				   partagée Parking et met à jour l'affichage de l'état du 
+//				   parking
+//
+// Contrat : Mise du handler sur SIGCHLD
+//
+// Algorithme :
+//
 {
 	
 	int position,place,id;
@@ -90,7 +95,7 @@ static void ITFinFils(int noSig)
 	place = WEXITSTATUS(place);
 	
 	//Recherche des infos de la voitures qui vient de se garer
-	for(int i=0;i<NB_PLACES;i++)
+	for(unsigned int i=0;i<NB_PLACES;i++)
 	{
 		if(mouvement[i].id == id)
 		{
@@ -106,9 +111,16 @@ static void ITFinFils(int noSig)
 			break;
 		}
 	}
-}
+}//----- fin de ItFinFils
 
-static void init(TypeBarriere barr, unsigned int semMP, unsigned int semSync, unsigned int semCompteur, unsigned int semPark,  unsigned int boiteAL, unsigned int MPReq, unsigned int MPPark, unsigned int MPCompteur)
+static void init(TypeBarriere barr, unsigned int semMP, unsigned int semSync, unsigned int semCompteur, unsigned int semPark,  
+					unsigned int boiteAL, unsigned int MPReq, unsigned int MPPark, unsigned int MPCompteur)
+// Mode d'emploi : Initialise la tâche BarriereEntree
+//
+// Contrat :
+//
+// Algorithme :
+//
 {
 	//masque les signaux SIGUSR1 et SIGUSR2
 	struct sigaction masquage;
@@ -176,17 +188,23 @@ static void init(TypeBarriere barr, unsigned int semMP, unsigned int semSync, un
     id_mpCompteur = MPCompteur;
     compteurPlace = (unsigned int *) shmat(id_mpCompteur,NULL,0);
     
+    //Initialisation du tableau mouvement
     mouvement = new VoitureEnMouvement[NB_PLACES];
-    for(int i=0;i<NB_PLACES;i++)
+    for(unsigned int i=0;i<NB_PLACES;i++)
     {
 		mouvement[i].id=0;
 	}
-}
+}//----- fin de init
 
-/**
- * T0D0 : rajouter le numero de la boite au lettre dans param de BE
- */
-void BarriereEntree(TypeBarriere barr, unsigned int semMP, unsigned int semSync, unsigned int semCompteur, unsigned int semPark,  unsigned int boiteAL, unsigned int MPReq, unsigned int MPPark, unsigned int MPCompteur)
+//----------------------------------------------------------------- PUBLIC
+
+//----------------------------------------------------- Méthodes publiques
+
+
+void BarriereEntree(TypeBarriere barr, unsigned int semMP, unsigned int semSync, unsigned int semCompteur, unsigned int semPark,  
+						unsigned int boiteAL, unsigned int MPReq, unsigned int MPPark, unsigned int MPCompteur)
+// Algorithme :
+//
 {
 	init(barr, semMP, semSync, semCompteur, semPark, boiteAL, MPReq, MPPark, MPCompteur);
 	
@@ -195,20 +213,24 @@ void BarriereEntree(TypeBarriere barr, unsigned int semMP, unsigned int semSync,
 		//Recuperation du message
 		while(msgrcv(id_bal, &newCar, sizeof(newCar.mVoiture), 1, 0) == -1);
 		
+		int placeParking;
+		
+		//Récupération du nombre de place restante
 		while(semop(id_semCompt, &semP,1 )==-1);
+		placeParking = (*compteurPlace);
+		while(semop(id_semCompt, &semV,1 )==-1);	
 		Afficher(MESSAGE, *compteurPlace);
-		if((*compteurPlace)>0)
-		{
-			//Mise à jour du nombre de place libre dans le Parking
-			(*compteurPlace)--;
-			while(semop(id_semCompt, &semV,1 )==-1);	
-			
-		}
+		
+		if(placeParking>0)
+		{}
 		else
-		{
-			while(semop(id_semCompt, &semV,1 )==-1);	
-						
+		{	
+			//Affichage de la requête		
 			AfficherRequete(barriere, newCar.mVoiture.type, time(NULL));
+			
+			//Dessine la voiture derrière la barrière
+			DessinerVoitureBarriere(barriere, newCar.mVoiture.type);
+			
 			//Depot de la requête
 			semop(id_semReq, &semP,1 );
 			voiturePresente[numMemoire].type = newCar.mVoiture.type;
@@ -218,17 +240,21 @@ void BarriereEntree(TypeBarriere barr, unsigned int semMP, unsigned int semSync,
 			// Attente de l'autorisation de garage
 			semop(id_semSync, &semP,1 );
 			
-			semop(id_semCompt, &semP,1 );
-			(*compteurPlace)--;
-			semop(id_semCompt, &semV,1 );
+			
 		}
+		
+		//Mise à jour du nombre de place libre dans le Parking
+		semop(id_semCompt, &semP,1 );
+		(*compteurPlace)--;
+		semop(id_semCompt, &semV,1 );
 		
 		//Creation voiturier
 		pid_t voiturier = GarerVoiture(barriere);
 		
 		newCar.mVoiture.hEntree = time(NULL);
 		
-		for(int i=0;i<NB_PLACES;i++)
+		//Mise à jour du tableau mouvement
+		for(unsigned int i=0;i<NB_PLACES;i++)
 		{
 			if(mouvement[i].id==0)
 			{
@@ -238,16 +264,8 @@ void BarriereEntree(TypeBarriere barr, unsigned int semMP, unsigned int semSync,
 			}
 		}
 		
+		//Attente de TEMPO secondes
 		sleep(TEMPO);
-		//AfficherRequete(barriere, newCar.type, newCar.hEntree);
-		
-
 	}
-}
+}//----- fin de BarriereEntree
 
-
-//------------------------------------------------------------------ PRIVE
-
-//----------------------------------------------------- Méthodes protégées
-
-//------------------------------------------------------- Méthodes privées
