@@ -33,5 +33,11 @@ void BarriereEntree(TypeBarriere barr, unsigned int semMP, unsigned int semSync,
 // Contrat :
 //
 
+typedef struct
+{
+	int id; //Obligatoire
+	Voiture infoVoiture; //Information a envoyé
+} VoitureEnMouvement;
+
 #endif // BARRIEREENTREE_H
 

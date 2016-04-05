@@ -15,7 +15,7 @@
 #include <signal.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <time.h>
+//#include <time.h>
 
 #include <sys/types.h>
 #include <sys/ipc.h>
@@ -129,8 +129,8 @@ void Commande( char code, unsigned int valeur)
 		{
 			//Mise en place des attributs de la voiture
 			nouveau.mVoiture.type = PROF;
-			nouveau.mVoiture.hEntree = time(NULL);
-			nouveau.mVoiture.hSortie = 0;
+			/*nouveau.mVoiture.hEntree = time(NULL);
+			nouveau.mVoiture.hSortie = 0;*/
 			nouveau.mVoiture.num = (nouveau.mVoiture.num+1)%1000;
 			nouveau.mtype = 1;
 
@@ -151,8 +151,8 @@ void Commande( char code, unsigned int valeur)
 		
 			//Mise en place des attributs de la voiture
 			nouveau.mVoiture.type = AUTRE;
-			nouveau.mVoiture.hEntree = time(NULL);
-			nouveau.mVoiture.hSortie = 0;
+			/*nouveau.mVoiture.hEntree = time(NULL);
+			nouveau.mVoiture.hSortie = 0;*/
 			nouveau.mVoiture.num = (nouveau.mVoiture.num+1)%1000;
 			nouveau.mtype = 1;
 			

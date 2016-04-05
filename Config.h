@@ -7,6 +7,7 @@
 
 static const char * REFERENCE = "./Mere.cpp"; 
 static const int DROITS = 0660;
+static const int TEMPO = 1;
 
 typedef struct Voiture Voiture;
 struct Voiture
