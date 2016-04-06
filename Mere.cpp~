@@ -73,89 +73,84 @@ int main()
 	int semParking;
 
 	parking = shmget(ftok(REFERENCE, 1), sizeof(Voiture)*8, IPC_CREAT | DROITS);
-	sortieVoiture = msgget(ftok(REFERENCE, 2), IPC_CREAT | DROITS);
-	compteurVoiture = shmget(ftok(REFERENCE, 3), sizeof(int), IPC_CREAT | DROITS);
-	semCpt = semget(ftok(REFERENCE, 4), 1, IPC_CREAT | DROITS);
-	semParking = semget(ftok(REFERENCE, 5), 1, IPC_CREAT | DROITS);
-	semctl(semCpt, 0, SETVAL, 1);
-	semctl(semParking, 0, SETVAL, 1);
-	
-	for(int i=0; i<3; i++)
-	{
-		Requete * req = (Requete*) shmat(requete[i], NULL, 0);
-		arriveeVoiture[i] = msgget(ftok(REFERENCE, 6+i), IPC_CREAT | DROITS);
-		requete[i] = shmget(ftok(REFERENCE, 9+i), sizeof(Requete), IPC_CREAT | DROITS);
-		autorisation[i] = semget(ftok(REFERENCE, 12+i), 1, IPC_CREAT | DROITS);
-		semRequete[i] = semget(ftok(REFERENCE, 15+i), 1, IPC_CREAT | DROITS);
-		semctl(autorisation[i], 0, SETVAL, 0);
-		semctl(semRequete[i], 0, SETVAL, 1);
-		req->used=1;
-		shmdt(req);
-		
-	}
-	
-	
 	Voiture * leParking = (Voiture *) shmat(parking,NULL,0);
 	leParking = new Voiture[8];
 
-	Voiture * park = (Voiture *) shmat(parking, NULL, 0);
 	for(int i=0; i<8; i++)
 	{
 		park[i].num=-1;
 	}
-	shmdt(park);
+	shmdt(leParking);
+	semParking = semget(ftok(REFERENCE, 2), 1, IPC_CREAT | DROITS);
+	semctl(semParking, 0, SETVAL, 1);
 
+	for(int i=0; i<3; i++)
+	{
+		arriveeVoiture[i] = msgget(ftok(REFERENCE, 3+i), IPC_CREAT | DROITS);
+
+		requete[i] = shmget(ftok(REFERENCE, 6+i), sizeof(Requete), IPC_CREAT | DROITS);
+		Requete * req = (Requete*) shmat(requete[i], NULL, 0);
+		req->used=1;
+		shmdt(req);
+		semRequete[i] = semget(ftok(REFERENCE, 9+i), 1, IPC_CREAT | DROITS);
+		semctl(semRequete[i], 0, SETVAL, 1);
+
+		autorisation[i] = semget(ftok(REFERENCE, 12+i), 1, IPC_CREAT | DROITS);
+		semctl(autorisation[i], 0, SETVAL, 0);
+		
+	}
+
+	sortieVoiture = msgget(ftok(REFERENCE, 15), IPC_CREAT | DROITS);
+
+	compteurVoiture = shmget(ftok(REFERENCE, 16), sizeof(int), IPC_CREAT | DROITS);
 	int * cpt = (int *) shmat(compteurVoiture, NULL, 0);
 	*cpt=8;
 	shmdt(cpt);
+	semCpt = semget(ftok(REFERENCE, 17), 1, IPC_CREAT | DROITS);
+	semctl(semCpt, 0, SETVAL, 1);	
 
 	//creation taches
 
-	if((gestionMenu = fork()) == 0)
+	if((barriereSortie = fork()) == 0)
 	{
-		GestionMenu(arriveeVoiture[1], arriveeVoiture[0], arriveeVoiture[2], sortieVoiture);
-		//exit(0);
+		BarriereSortie(parking, requete, autorisation, sortieVoiture, semParking, semRequete, compteurVoiture, semCpt);
 	}
 	else
 	{
 		if((barrieresEntree[0] = fork()) == 0)
 		{
 			BarriereEntree(PROF_BLAISE_PASCAL, semRequete[0], autorisation[0], semCpt, semParking, arriveeVoiture[0], requete[0], parking, compteurVoiture);
-			//exit(0);
 		}
 		else
 		{
 			if((barrieresEntree[1] = fork()) == 0)
 			{
 				BarriereEntree(AUTRE_BLAISE_PASCAL, semRequete[1], autorisation[1], semCpt, semParking, arriveeVoiture[1], requete[1], parking, compteurVoiture);
-				//exit(0);
 			}
 			else
 			{
 				if((barrieresEntree[2] = fork()) == 0)
 				{
 					BarriereEntree(ENTREE_GASTON_BERGER, semRequete[2], autorisation[2], semCpt, semParking, arriveeVoiture[2], requete[2], parking, compteurVoiture);
-					//exit(0);
 				}
 				else
 				{
-					if((barriereSortie = fork()) == 0)
+					if((gestionMenu = fork()) == 0)
 					{
-						BarriereSortie(parking, requete, autorisation, sortieVoiture, semParking, semRequete, compteurVoiture, semCpt);
-						//exit(0);
+						GestionMenu(arriveeVoiture[1], arriveeVoiture[0], arriveeVoiture[2], sortieVoiture);
 					}
 					else
 					{
 						heure = ActiverHeure();
 						waitpid(gestionMenu, NULL, 0);
+						kill(barriereSortie, SIGUSR2);
+						waitpid(barriereSortie, NULL, 0);
 						kill(barrieresEntree[0], SIGUSR2);
 						waitpid(barrieresEntree[0], NULL, 0);
 						kill(barrieresEntree[1], SIGUSR2);
 						waitpid(barrieresEntree[1], NULL, 0);
 						kill(barrieresEntree[2], SIGUSR2);	
-						waitpid(barrieresEntree[2], NULL, 0);
-						kill(barriereSortie, SIGUSR2);
-						waitpid(barriereSortie, NULL, 0);
+						waitpid(barrieresEntree[2], NULL, 0);	
 						kill(heure, SIGUSR2);
 						waitpid(heure, NULL, 0);
 

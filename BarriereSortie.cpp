@@ -80,6 +80,7 @@ void BarriereSortie(int idParking, int idRequete[], int idAutorisation[], int id
 //------------------------------------------------------------------ PRIVE
 
 void end(int noSignal)
+// fin du processus, appelé a reception de SIGUSR2
 {
 
 	for(int i=0; i<8; i++)
@@ -103,6 +104,7 @@ void end(int noSignal)
 }
 
 void run(int idSortieVoiture)
+// phase moteur
 {
 	while(true)
 	{
@@ -114,6 +116,7 @@ void run(int idSortieVoiture)
 }
 
 void finNormale(int noSignal)
+// appelée a reception de SIGCHLD
 {
 	int place;
 	waitpid(0, &place, 0);
@@ -162,6 +165,8 @@ void finNormale(int noSignal)
 
 
 void checkAutorisations()
+// met a jour les autorisations de se garer en fonction des priorités apres
+// une sortie de vehicule
 {
 	if(*compteur==1)
 	{
@@ -213,12 +218,6 @@ void checkAutorisations()
 
 void init(int idParking, int idCpt, int semCpt, int semParking, int idRequete[], int semRequete[], int idAutorisation[])
 {
-	parking = (Voiture*) shmat(idParking, NULL, 0);
-	compteur = (int *) shmat(idCpt, NULL, 0);
-
-	semCompteur = semCpt;
-	semPark = semParking;
-
 	//handler terminaison
 	struct sigaction termine;
 	termine.sa_handler = end;
@@ -233,12 +232,19 @@ void init(int idParking, int idCpt, int semCpt, int semParking, int idRequete[],
 	finVoiturier.sa_flags=0;
 	sigaction(SIGCHLD, &finVoiturier, NULL);
 
+	parking = (Voiture*) shmat(idParking, NULL, 0);
+	compteur = (int *) shmat(idCpt, NULL, 0);
+
+	semCompteur = semCpt;
+	semPark = semParking;
+
 	for(int i=0; i<3; i++)
 	{
 		requete[i] = (Requete*) shmat(idRequete[i], NULL, 0);
 		semReq[i] = semRequete[i];
 		idAuto[i] = idAutorisation[i];
 	}
+
 }
 
 

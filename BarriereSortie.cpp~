@@ -177,7 +177,7 @@ void checkAutorisations()
 			}
 			else if(requete[i]->used == 0)
 			{
-				if(requete[nChoisi]->type < requete[i]->type)
+				if(requete[nChoisi]->type > requete[i]->type)
 				{
 					nChoisi=i;
 				}
@@ -213,12 +213,6 @@ void checkAutorisations()
 
 void init(int idParking, int idCpt, int semCpt, int semParking, int idRequete[], int semRequete[], int idAutorisation[])
 {
-	parking = (Voiture*) shmat(idParking, NULL, 0);
-	compteur = (int *) shmat(idCpt, NULL, 0);
-
-	semCompteur = semCpt;
-	semPark = semParking;
-
 	//handler terminaison
 	struct sigaction termine;
 	termine.sa_handler = end;
@@ -233,12 +227,19 @@ void init(int idParking, int idCpt, int semCpt, int semParking, int idRequete[],
 	finVoiturier.sa_flags=0;
 	sigaction(SIGCHLD, &finVoiturier, NULL);
 
+	parking = (Voiture*) shmat(idParking, NULL, 0);
+	compteur = (int *) shmat(idCpt, NULL, 0);
+
+	semCompteur = semCpt;
+	semPark = semParking;
+
 	for(int i=0; i<3; i++)
 	{
 		requete[i] = (Requete*) shmat(idRequete[i], NULL, 0);
 		semReq[i] = semRequete[i];
 		idAuto[i] = idAutorisation[i];
 	}
+
 }
 
 
