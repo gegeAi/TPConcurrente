@@ -233,10 +233,6 @@ void BarriereEntree(TypeBarriere barr, unsigned int semMP, unsigned int semSync,
 		//Mise à jour du nombre de place libre dans le Parking
 		while(semop(id_semCompt, &semP,1 ) == -1);
 		(*compteurPlace)--;
-		if(*compteurPlace < 0)
-		{
-			*compteurPlace=0;
-		}
 		while(semop(id_semCompt, &semV,1 ) == -1);
 		
 		//Creation voiturier
