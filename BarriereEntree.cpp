@@ -40,7 +40,6 @@ static messVoiture newCar ;
 static Voiture * parking;
 static Requete * voiturePresente;
 static unsigned int * compteurPlace;
-static pid_t noFils;
 static VoitureEnMouvement * mouvement;
 
 //operation p
@@ -60,7 +59,7 @@ static void ITFin(int noSig)
 //
 {
 	//Envoi de SIGUSR2 aux Voituriers
-	for(int i=0;i<NB_PLACES;i++)
+	for(unsigned int i=0;i<NB_PLACES;i++)
 	{
 		if(mouvement[i].id!=0)
 		{
@@ -88,7 +87,7 @@ static void ITFinFils(int noSig)
 //
 {
 	
-	int position,place,id;
+	int place,id;
 	
 	//Recuperation du pid du Voiturier
 	id = waitpid(0, &place, 0);
@@ -199,18 +198,16 @@ void BarriereEntree(TypeBarriere barr, unsigned int semMP, unsigned int semSync,
 	{
 		//Recuperation du message
 		while(msgrcv(id_bal, &newCar, sizeof(newCar.mVoiture), 1, 0) == -1);
-		
-		int placeParking;
-		
+
 		//Récupération du nombre de place restante
 		while(semop(id_semCompt, &semP,1 )==-1);
-		placeParking = (*compteurPlace);
-		while(semop(id_semCompt, &semV,1 )==-1);	
-		
-		if(placeParking>0)
-		{}
+		if((*compteurPlace)>0)
+		{
+			while(semop(id_semCompt, &semV,1 )==-1);
+		}
 		else
 		{	
+			while(semop(id_semCompt, &semV,1 )==-1);
 			//Affichage de la requête		
 			AfficherRequete(barriere, newCar.mVoiture.type, time(NULL));
 			
@@ -233,10 +230,6 @@ void BarriereEntree(TypeBarriere barr, unsigned int semMP, unsigned int semSync,
 		//Mise à jour du nombre de place libre dans le Parking
 		while(semop(id_semCompt, &semP,1 ) == -1);
 		(*compteurPlace)--;
-		if(*compteurPlace < 0)
-		{
-			*compteurPlace=0;
-		}
 		while(semop(id_semCompt, &semV,1 ) == -1);
 		
 		//Creation voiturier
