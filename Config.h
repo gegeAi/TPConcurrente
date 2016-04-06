@@ -1,7 +1,7 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#include "Outils.h"
+#include "/shares/public/tp/tp-multitache/Outils.h"
 
 #include <time.h>
 

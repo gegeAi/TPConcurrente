@@ -26,8 +26,8 @@
 #include "GestionMenu.h"
 #include "BarriereEntree.h"
 #include "BarriereSortie.h"
-#include "Outils.h"
-#include "Heure.h"
+#include "/share/public/tp/tp-multitache/Outils.h"
+#include "/share/public/tp/tp-multitache/Heure.h"
 #include "Config.h"
 
 ///////////////////////////////////////////////////////////////////  PRIVE
@@ -78,7 +78,7 @@ int main()
 
 	for(int i=0; i<8; i++)
 	{
-		park[i].num=-1;
+		leParking[i].num=-1;
 	}
 	shmdt(leParking);
 	semParking = semget(ftok(REFERENCE, 2), 1, IPC_CREAT | DROITS);

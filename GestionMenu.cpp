@@ -22,9 +22,9 @@
 #include <errno.h>
 //------------------------------------------------------ Include personnel
 #include "GestionMenu.h"
-#include "Menu.h"
+#include "/shares/public/tp/tp-multitache/Menu.h"
 
-#include "Outils.h"
+#include "/shares/public/tp/tp-multitache/Outils.h"
 #include "Config.h"
 using namespace std;
 ///////////////////////////////////////////////////////////////////  PRIVE

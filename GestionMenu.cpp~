@@ -15,7 +15,6 @@
 #include <signal.h>
 #include <stdlib.h>
 #include <unistd.h>
-//#include <time.h>
 
 #include <sys/types.h>
 #include <sys/ipc.h>
@@ -23,9 +22,9 @@
 #include <errno.h>
 //------------------------------------------------------ Include personnel
 #include "GestionMenu.h"
-#include "Menu.h"
+#include "/share/public/tp/tp-multitache/Menu.h"
 
-#include "Outils.h"
+#include "/share/public/tp/tp-multitache/Outils.h"
 #include "Config.h"
 using namespace std;
 ///////////////////////////////////////////////////////////////////  PRIVE
@@ -124,7 +123,7 @@ void Commande( char code, unsigned int valeur)
 			}
 			else
 			{
-				msgsnd(id_balGB,&nouveau,TAILLE_MSG_VOITURE,IPC_NOWAIT);
+				msgsnd(id_balGB,&nouveau,sizeof(nouveau.mVoiture),IPC_NOWAIT);
 
 			}
 			break;
@@ -140,13 +139,13 @@ void Commande( char code, unsigned int valeur)
 			//Envoi du message à la boite au lettre correspondante
 			if(valeur == 1)
 			{			
-				msgsnd(id_balAutres,&nouveau,TAILLE_MSG_VOITURE,IPC_NOWAIT);
+				msgsnd(id_balAutres,&nouveau,sizeof(nouveau.mVoiture),IPC_NOWAIT);
 
 			}
 			else
 			{
 		
-				msgsnd(id_balGB,&nouveau,TAILLE_MSG_VOITURE,IPC_NOWAIT);
+				msgsnd(id_balGB,&nouveau,sizeof(nouveau.mVoiture),IPC_NOWAIT);
 			}
 			break;
 		}

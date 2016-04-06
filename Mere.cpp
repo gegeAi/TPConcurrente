@@ -26,8 +26,8 @@
 #include "GestionMenu.h"
 #include "BarriereEntree.h"
 #include "BarriereSortie.h"
-#include "Outils.h"
-#include "Heure.h"
+#include "/shares/public/tp/tp-multitache/Outils.h"
+#include "/shares/public/tp/tp-multitache/Heure.h"
 #include "Config.h"
 
 ///////////////////////////////////////////////////////////////////  PRIVE

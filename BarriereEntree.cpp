@@ -24,7 +24,7 @@ using namespace std;
 #include <sys/shm.h>
 //------------------------------------------------------ Include personnel
 #include "BarriereEntree.h"
-#include "Outils.h"
+#include "/shares/public/tp/tp-multitache/Outils.h"
 
 //---------------------------------------------------- Variables de classe
 static int id_bal;
