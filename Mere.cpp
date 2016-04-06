@@ -78,7 +78,7 @@ int main()
 
 	for(int i=0; i<8; i++)
 	{
-		park[i].num=-1;
+		leParking[i].num=-1;
 	}
 	shmdt(leParking);
 	semParking = semget(ftok(REFERENCE, 2), 1, IPC_CREAT | DROITS);
@@ -142,7 +142,11 @@ int main()
 					else
 					{
 						heure = ActiverHeure();
+
+						//attente de fin
 						waitpid(gestionMenu, NULL, 0);
+
+						//fin des processus
 						kill(barriereSortie, SIGUSR2);
 						waitpid(barriereSortie, NULL, 0);	
 						for(int i=0; i<3; i++)
